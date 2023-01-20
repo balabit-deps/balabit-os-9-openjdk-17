@@ -1,14 +1,67 @@
-openjdk-17 (17.0.4+8-1~22.04) jammy-security; urgency=medium
+openjdk-17 (17.0.6+10-0ubuntu1~22.04) jammy-security; urgency=medium
 
-  * OpenJDK 17.0.4 release, build 8.
-  * Addresses security issues: CVE-2022-34169, CVE-2022-21541,
-    CVE-2022-21540, CVE-2022-21549.
+  * Upload to Ubuntu 22.04.
 
- -- Matthias Klose <doko@ubuntu.com>  Fri, 22 Jul 2022 10:57:45 +0200
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 20 Jan 2023 21:56:27 +1300
+
+openjdk-17 (17.0.6+10-0ubuntu1) lunar; urgency=medium
+
+  * OpenJDK 17.0.6 release, build 10.
+    - CVE-2023-21835, CVE-2023-21843
+    - Release notes:
+      https://www.oracle.com/java/technologies/javase/17-0-6-relnotes.html
+  * debian/patches/*: Refreshed patches for the new release and dropped unused
+    patches.
+  * debian/rules: add lunar to jtreg version selection.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 19 Jan 2023 21:34:14 +1300
+
+openjdk-17 (17.0.5+8-2ubuntu1) kinetic-security; urgency=medium
+
+  * Handle jtreg package name for backports.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 24 Oct 2022 18:33:55 +0200
+
+openjdk-17 (17.0.5+8-2) unstable; urgency=medium
+
+  * Fix the binary-indep only build.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 19 Oct 2022 16:23:50 +0200
+
+openjdk-17 (17.0.5+8-1) unstable; urgency=high
+
+  * OpenJDK 17.0.5+8 (release).
+  * Security fixes
+    - JDK-8289366: Improve HTTP/2 client usage.
+    - JDK-8288508: Enhance ECDSA usage.
+    - JDK-8286918: Better HttpServer service.
+    - JDK-8287446: Enhance icon presentations.
+    - JDK-8286910: Improve JNDI lookups.
+    - JDK-8286511: Improve macro allocation.
+    - JDK-8286526: Improve NTLM support.
+    - JDK-8286533: Key X509 usages.
+    - JDK-8286077: Wider MultiByte conversions.
+    - JDK-8286519: Better memory handling.
+    - JDK-8285662: Better permission resolution.
+    - JDK-8282252: Improve BigInteger/Decimal validation.
+  * Build using GCC 12 in recent development distros.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 19 Oct 2022 06:59:58 +0200
 
 openjdk-17 (17.0.4+8-1) unstable; urgency=high
 
   * OpenJDK 17.0.4+8 (release).
+  * Security fixes
+    - JDK-8272243: Improve DER parsing.
+    - JDK-8272249: Better properties of loaded Properties.
+    - JDK-8273056, JDK-8283875, CVE-2022-21549: java.util.random does not
+      correctly sample exponential or Gaussian distributions.
+    - JDK-8277608: Address IP Addressing.
+    - JDK-8281859, CVE-2022-21540: Improve class compilation.
+    - JDK-8281866, CVE-2022-21541: Enhance MethodHandle invocations.
+    - JDK-8283190: Improve MIDI processing.
+    - JDK-8284370: Improve zlib usage.
+    - JDK-8285407, CVE-2022-34169: Improve Xalan supports.
   * Disable the reproducible-copyright-headers patch.
   * Only try to re-run failed tests once instead of three times.
 

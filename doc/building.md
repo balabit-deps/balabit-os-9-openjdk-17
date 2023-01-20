@@ -179,10 +179,10 @@ On Windows, it is important that you pay attention to the instructions in the
 
 Windows is the only non-POSIX OS supported by the JDK, and as such, requires
 some extra care. A POSIX support layer is required to build on Windows.
-Currently, the only supported such layers are Cygwin and Windows Subsystem for
-Linux (WSL). (Msys is no longer supported due to a too old bash; msys2 would
-likely be possible to support in a future version but that would require effort
-to implement.)
+Currently, the only supported such layers are Cygwin, Windows Subsystem for
+Linux (WSL), and MSYS2. (MSYS is no longer supported due to an outdated bash;
+While OpenJDK can be built with MSYS2, support for it is still experimental, so
+build failures and unusual errors are not uncommon.)
 
 Internally in the build system, all paths are represented as Unix-style paths,
 e.g. `/cygdrive/c/git/jdk/Makefile` rather than `C:\git\jdk\Makefile`. This
@@ -323,7 +323,7 @@ issues.
  ------------------ -------------------------------------------------------
  Linux              gcc 10.2.0
  macOS              Apple Xcode 10.1 (using clang 10.0.0)
- Windows            Microsoft Visual Studio 2019 update 16.7.2
+ Windows            Microsoft Visual Studio 2022 update 17.1.0
 
 All compilers are expected to be able to compile to the C99 language standard,
 as some C99 features are used in the source code. Microsoft Visual Studio
@@ -818,7 +818,7 @@ configuration, as opposed to the "configure time" configuration.
 #### Test Make Control Variables
 
 These make control variables only make sense when running tests. Please see
-[Testing the JDK](testing.html) for details.
+**Testing the JDK** ([html](testing.html), [markdown](testing.md)) for details.
 
   * `TEST`
   * `TEST_JOBS`
@@ -865,8 +865,44 @@ To execute the most basic tests (tier 1), use:
 make run-test-tier1
 ```
 
-For more details on how to run tests, please see the [Testing
-the JDK](testing.html) document.
+For more details on how to run tests, please see **Testing the JDK**
+([html](testing.html), [markdown](testing.md)).
+
+## Signing
+
+### macOS
+
+Modern versions of macOS require applications to be signed and notarizied before
+distribution. See Apple's documentation for more background on what this means
+and how it works. To help support this, the JDK build can be configured to
+automatically sign all native binaries, and the JDK bundle, with all the options
+needed for successful notarization, as well as all the entitlements required by
+the JDK. To enable `hardened` signing, use configure parameter
+`--with-macosx-codesign=hardened` and configure the signing identity you wish to
+use with `--with-macosx-codesign-identity=<identity>`. The identity refers to a
+signing identity from Apple that needs to be preinstalled on the build host.
+
+When not signing for distribution with the hardened option, the JDK build will
+still attempt to perform `adhoc` signing to add the special entitlement
+`com.apple.security.get-task-allow` to each binary. This entitlement is required
+to be able to dump core files from a process. Note that adding this entitlement
+makes the build invalid for notarization, so it is only added when signing in
+`debug` mode. To explicitly enable this kind of adhoc signing, use configure
+parameter `--with-macosx-codesign=debug`. It will be enabled by default in most
+cases.
+
+It's also possible to completely disable any explicit codesign operations done
+by the JDK build using the configure parameter `--without-macosx-codesign`.
+The exact behavior then depends on the architecture. For macOS on x64, it (at
+least at the time of this writing) results in completely unsigned binaries that
+should still work fine for development and debugging purposes. On aarch64, the
+Xcode linker will apply a default "adhoc" signing, without any entitlements.
+Such a build does not allow dumping core files.
+
+The default mode "auto" will try for `hardened` signing if the debug level is
+`release` and either the default identity or the specified identity is valid.
+If hardened isn't possible, then `debug` signing is chosen if it works. If
+nothing works, the codesign build step is disabled.
 
 ## Cross-compiling
 

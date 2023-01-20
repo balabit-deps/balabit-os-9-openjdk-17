@@ -564,7 +564,7 @@ var getJibProfilesProfiles = function (input, common, data) {
             "ANT_HOME": input.get("ant", "home_path")
         }
     };
-    [ "linux-x64", "macosx-x64", "windows-x64"]
+    [ "linux-x64", "macosx-aarch64", "macosx-x64", "windows-x64", "linux-aarch64"]
         .forEach(function (name) {
             var maketestName = name + "-testmake";
             profiles[maketestName] = concatObjects(profiles[name], testmakeBase);
@@ -1049,7 +1049,7 @@ var getJibProfilesDependencies = function (input, common) {
     var devkit_platform_revisions = {
         linux_x64: "gcc10.3.0-OL6.4+1.0",
         macosx: "Xcode12.4+1.0",
-        windows_x64: "VS2019-16.9.3+1.0",
+        windows_x64: "VS2022-17.1.0+1.0",
         linux_aarch64: "gcc10.3.0-OL7.6+1.0",
         linux_arm: "gcc8.2.0-Fedora27+1.0",
         linux_ppc64le: "gcc8.2.0-Fedora27+1.0",
