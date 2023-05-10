@@ -21,7 +21,7 @@ Reviewed-by: aph, erikj, ehelin, ihse
 +fi
 +
  DIR=`dirname $0`
- OUT=`. $DIR/autoconf-config.guess`
+ OUT=`. $DIR/autoconf-config.guess 2> /dev/null`
  
 --- a/make/autoconf/build-aux/config.sub
 +++ b/make/autoconf/build-aux/config.sub
@@ -58,7 +58,7 @@ Reviewed-by: aph, erikj, ehelin, ihse
  exit $exitcode
 --- a/src/hotspot/os/linux/os_linux.cpp
 +++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -2558,6 +2558,8 @@
+@@ -2559,6 +2559,8 @@
    strncpy(cpuinfo, "IA64", length);
  #elif defined(PPC)
    strncpy(cpuinfo, "PPC64", length);
