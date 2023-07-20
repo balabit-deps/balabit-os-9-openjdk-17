@@ -10,7 +10,7 @@
      int lineno = 0;
      jlong start = 0, end = 0;
 @@ -2015,6 +2015,11 @@
- 
+
      jvmCfg = fopen(jvmCfgName, "r");
      if (jvmCfg == NULL) {
 +      char cfgName[strlen(jvmCfgName)+10];

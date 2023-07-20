@@ -55,7 +55,7 @@ endif
 
 multiarch_dir = /$(DEB_HOST_MULTIARCH)
 
-hotspot_archs	= amd64 i386 arm64 armhf ppc64 ppc64el s390x
+hotspot_archs	= amd64 i386 arm64 armhf ppc64 ppc64el riscv64 s390x
 jtreg_archs	= $(hotspot_archs) alpha ia64 powerpc ppc64 sh4 x32
 jtreg_archs	+= armel mipsel mips64el
 jtreg_archs	+= riscv64
@@ -105,26 +105,19 @@ v_debian	:= $(shell echo $(PKGVERSION) | sed 's/ea//' | sed 's/\~us[[:digit:]]\+
 v_upstream	:= $(shell echo $(v_debian) | sed 's/-[^-][^-]*$$//')
 v_pkgrel	:= $(shell echo $(v_debian) | sed 's/^.*-//')
 
-# uncomment for final release
-v_upbase	:= $(word 1, $(subst +, , $(v_upstream)))
-v_upbuild	:= $(word 2, $(subst +, , $(v_upstream)))
-
-# uncomment for pre-release
-#v_upbase	:= $(word 1, $(subst ~, , $(v_upstream)))
-#v_upbuild	:= $(word 2, $(subst ~, , $(v_upstream)))
-# that should be the package version ...
-
-#$(warning XXXXX $(v_upstream) / $(v_pkgrel) / $(v_upbase) / $(v_upbuild))
-
-#uncomment for final release
-ifneq ($(v_debian),$(v_upbase)+$(v_upbuild)-$(v_pkgrel))
-  $(error wrong version: $(v_upbase)+$(v_upbuild)-$(v_pkgrel) should be: $(v_debian))
+ifeq (yes,$(is_upstream_release))
+  v_upbase	:= $(word 1, $(subst +, , $(v_upstream)))
+  v_upbuild	:= $(word 2, $(subst +, , $(v_upstream)))
+  ifneq ($(v_debian),$(v_upbase)+$(v_upbuild)-$(v_pkgrel))
+    $(error wrong version: $(v_upbase)+$(v_upbuild)-$(v_pkgrel) should be: $(v_debian))
+  endif
+else
+  v_upbase	:= $(word 1, $(subst ~, , $(v_upstream)))
+  v_upbuild	:= $(word 2, $(subst ~, , $(v_upstream)))
+  ifneq ($(v_debian),$(v_upbase)~$(v_upbuild)-$(v_pkgrel))
+    $(error wrong version: $(v_upbase)~$(v_upbuild)-$(v_pkgrel) should be: $(v_debian))
+  endif
 endif
-
-# uncomment for pre-releases
-#ifneq ($(v_debian),$(v_upbase)~$(v_upbuild)-$(v_pkgrel))
-#  $(error wrong version: $(v_upbase)~$(v_upbuild)-$(v_pkgrel) should be: $(v_debian))
-#endif
 
 ifneq (,$(DEB_HOST_MULTIARCH))
   jdirname	= java-$(shortver)-$(origin)-$(DEB_HOST_ARCH)
@@ -164,13 +157,18 @@ ifneq (,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
 endif
 
 jtreg_pkg = jtreg6
+testng_pkg= libtestng7-java
 
 with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
-ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel mipsel mips64el riscv64))
+ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 mipsel mips64el powerpc x32))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
+ifeq ($(distribution)-$(distrel),Ubuntu-riscv64)
+  with_check = yes
+endif
+
 # no jtreg backport yet
-ifneq (,$(filter $(distrel), buster bullseye precise trusty xenial bionic focal groovy hirsute impish))
+ifneq (,$(filter $(distrel), buster bullseye precise trusty xenial groovy hirsute impish))
   with_check = disabled for $(distrel), no $(jtreg_pkg)
 endif
 
@@ -299,7 +297,7 @@ dpkg_buildflags_hs = \
 # jdk/make/CompileDemos.gmk (SetupJVMTIDemo) doesn't like commas in flags
 dpkg_buildflags_hs += \
 	DEB_LDFLAGS_MAINT_STRIP="-Wl,-z,relro -Wl,-Bsymbolic-functions" \
-	DEB_LDFLAGS_MAINT_APPEND="-Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
+	DEB_LDFLAGS_MAINT_APPEND="-Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions -Xlinker --no-as-needed"
 dpkg_buildflags_hs += dpkg-buildflags
 export EXTRA_CPPFLAGS_HS := $(shell $(dpkg_buildflags_hs) --get CPPFLAGS)
 export EXTRA_CFLAGS_HS   := $(shell $(dpkg_buildflags_hs) --get CFLAGS; $(dpkg_buildflags_hs) --get CPPFLAGS)
@@ -315,7 +313,7 @@ dpkg_buildflags_zero = \
 # jdk/make/CompileDemos.gmk (SetupJVMTIDemo) doesn't like commas in flags
 dpkg_buildflags_zero += \
 	DEB_LDFLAGS_MAINT_STRIP="-Wl,-z,relro -Wl,-Bsymbolic-functions" \
-	DEB_LDFLAGS_MAINT_APPEND="-Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
+	DEB_LDFLAGS_MAINT_APPEND="-Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions -Xlinker --no-as-needed"
 dpkg_buildflags_zero += dpkg-buildflags
 export EXTRA_CPPFLAGS_ZERO := $(shell $(dpkg_buildflags_zero) --get CPPFLAGS)
 export EXTRA_CFLAGS_ZERO   := $(shell $(dpkg_buildflags_zero) --get CFLAGS; $(dpkg_buildflags_zero) --get CPPFLAGS)
@@ -325,19 +323,6 @@ export EXTRA_LDFLAGS_ZERO  := $(shell $(dpkg_buildflags_zero) --get LDFLAGS)
 ifeq ($(DEB_HOST_ARCH),alpha)
   export EXTRA_LDFLAGS_ZERO += -Wl,--no-relax
 endif
-
-# for JDK: jdk/make/common/Defs.gmk
-# Don't overwrite JDK opt level :
-# 1) with forced -03, it cause wrong Math.* computations, see #679292 and #678228
-# 2) JDK already use it's own OPTIMIZATION_LEVEL variable for each module
-dpkg_buildflags_jdk = \
-	DEB_BUILD_MAINT_OPTIONS="$(DEB_BUILD_MAINT_OPTIONS)" \
-	DEB_CFLAGS_MAINT_STRIP="-O2" DEB_CXXFLAGS_MAINT_STRIP="-O2"
-dpkg_buildflags_jdk += dpkg-buildflags
-export EXTRA_CPPFLAGS_JDK := $(shell $(dpkg_buildflags_jdk) --get CPPFLAGS)
-export EXTRA_CFLAGS_JDK   := $(shell $(dpkg_buildflags_jdk) --get CFLAGS) $(shell $(dpkg_buildflags_jdk) --get CPPFLAGS)
-export EXTRA_CXXFLAGS_JDK := $(shell $(dpkg_buildflags_jdk) --get CXXFLAGS)
-export EXTRA_LDFLAGS_JDK  := $(shell $(dpkg_buildflags_jdk) --get LDFLAGS)
 
 ifneq (,$(filter $(distrel),squeeze lucid))
   with_bridge = bridge
@@ -543,6 +528,12 @@ ifneq (,$(filter $(distrel),precise trusty xenial))
   # building with a GCC from a PPA ...
   COMMON_CONFIGURE_ARGS += \
 	--with-stdc++lib=static
+else ifneq (,$(filter $(DEB_HOST_ARCH), ia64))
+  # seen in 2023 on ia64:
+  # /usr/bin/ld: jvm-test-launcher: no symbol version section for versioned symbol `__cxa_pure_virtual@CXXABI_1.3'
+  # works when linking statically
+  COMMON_CONFIGURE_ARGS += \
+	--with-stdc++lib=static
 else
   COMMON_CONFIGURE_ARGS += \
 	--with-stdc++lib=dynamic
@@ -606,7 +597,7 @@ all_tools	=  jar jarsigner java javac javadoc javap jcmd \
 jdk_hl_tools	= jar jarsigner javac javadoc javap jcmd jdb \
 	jdeprscan jdeps jfr jimage jinfo jlink jmap jmod jps \
 	jrunscript jshell jstack jstat jstatd serialver
-ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 m68k mips mipsel mips64el powerpc riscv64 s390x sh4 sparc64 x32))
+ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 m68k mips mipsel mips64el powerpc s390x sh4 sparc64 x32))
   all_tools	+= jhsdb
   jdk_hl_tools	+= jhsdb
 endif
@@ -674,12 +665,11 @@ ifeq ($(with_system_hb),yes)
   bd_openjdk += libharfbuzz-dev,
 endif
 
-pkg_ffidev = libffi-dev
-
-bd_zero = \
-	$(pkg_ffidev) [$(foreach a,$(hotspot_archs),!$(a))],
-bd_zero = \
-	$(pkg_ffidev),
+ifeq (,$(filter $(distrel),precise))
+  bd_zero = libffi-dev, libffi-dev:native,
+else
+  bd_zero = libffi-dev,
+endif
 
 bd_ant = ant, ant-optional,
 
@@ -716,13 +706,15 @@ min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^require
 
 ifeq ($(with_check),yes)
   bd_check = \
-    $(jtreg_pkg) (>= $(min_jtreg_version))$(nocheck_profile), libtestng7-java$(nocheck_profile), \
+    $(jtreg_pkg) (>= $(min_jtreg_version))$(nocheck_profile), $(testng_pkg)$(nocheck_profile), \
     xvfb$(nocheck_profile), xauth$(nocheck_profile), \
     xfonts-base$(nocheck_profile), libgl1-mesa-dri [!x32]$(nocheck_profile), \
     xfwm4$(nocheck_profile), x11-xkb-utils$(nocheck_profile), \
-    dbus-x11$(nocheck_profile), libasmtools-java$(nocheck_profile), \
-    googletest$(nocheck_profile), google-mock$(nocheck_profile),\
-    xvfb $(nocheck_profile),
+    dbus-x11$(nocheck_profile), googletest$(nocheck_profile), \
+    google-mock$(nocheck_profile), xvfb $(nocheck_profile),
+ifeq (,$(filter $(distrel),jessie stretch buster))
+    bd_check += libasmtools-java$(nocheck_profile),
+endif
 else
   bd_check = file,
 endif
@@ -838,6 +830,7 @@ d_dbg	= debian/$(p_dbg)
 
 control_vars = \
 	'-Vvm:Name=$(vm_name)' \
+	'-Vvm:Version=$(shortver)' \
 	'-Vdlopenhl:Depends=$(dlopen_hl_depends)' \
 	'-Vdlopenhl:Recommends=$(dlopen_hl_recommends)' \
 	'-Vdlopenjre:Depends=$(dlopen_jre_depends)' \
@@ -1270,7 +1263,7 @@ install: packaging-files
 
 	chmod -R u+w $(d)
 
-	: # use javaws from icedtea-netx 
+	: # use javaws from icedtea-netx
 	find $(d) -name 'javaws*' | xargs -r rm -f
 
 	: # install default jvm config file
@@ -1903,9 +1896,8 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 is_release		= yes
-#is_release		=
 git_project		= jdk17u
-git_tag			= jdk-17.0.6+10
+git_tag			= jdk-17.0.8+7
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_release),yes)
@@ -1940,8 +1932,8 @@ get-orig:
 	rm -rf $(topdir)
 
 # keep these in the tarball, older lcms are not supported
-	  rm -v -f $$d/src/java.desktop/share/native/liblcms/cms*.c; \
-	  rm -v -f $$d/src/java.desktop/share/native/liblcms/lcms2*.h; \
+#	  rm -v -f $$d/src/java.desktop/share/native/liblcms/cms*.c; \
+#	  rm -v -f $$d/src/java.desktop/share/native/liblcms/lcms2*.h; \
 
 	rm -rf $(origdir)
 
