@@ -1,24 +1,69 @@
-openjdk-17 (17.0.8.1+1~us1-0ubuntu1~22.04) jammy-security; urgency=high
+openjdk-17 (17.0.9+9-1~22.04) jammy-security; urgency=high
 
   * Upload to Ubuntu 22.04.
+  * Release notes correction:
+    - CVE-2023-22081, CVE-2023-22025.
+    - Release notes:
+      https://mail.openjdk.org/pipermail/jdk-updates-dev/2023-October/026352.html
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 25 Aug 2023 10:57:54 +1200
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 19 Oct 2023 20:43:47 +1300
 
-openjdk-17 (17.0.8.1+1~us1-0ubuntu1) mantic; urgency=high
+openjdk-17 (17.0.9+9-1) unstable; urgency=high
 
-  * OpenJDK 17.0.8.1 release, build 1.
-    - REGRESSION UPDATE: 8313765: Invalid CEN header (invalid zip64 extra data
-      field size) (LP: #2032865).
+  * OpenJDK 17.0.9 release, build 9.
+    - CVE-2023-30589, CVE-2023-22081, CVE-2023-22091, CVE-2023-22025.	
+      The patch for CVE-2023-30589 also addresses CVE-2023-30585,
+      CVE-2023-30588, and CVE-2023-30590.
+    - Release notes: 
+      https://www.oracle.com/java/technologies/javase/17-0-9-relnotes.html#R17_0_9
+
+  [ Vladimir Petko ]
+  * Backport upstream fix for jexec: can't locate java:
+    No such file or directory.  Closes: #1029342.
+  * d/rules, d/watch: Bundle googletest 1.14.
+  * d/copyright: Add googletest copyright.
+  * d/test: Update problemlist.
+  * d/p: exclude-broken-tests.patch.
+  * d/p/reproducible-properties-timestamp.diff: Use the privileged action
+    to read the system property (JDK-8272157, 914278).
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 18 Oct 2023 09:07:04 +0200
+
+openjdk-17 (17.0.9~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.9 early access, build 6.
+
+  [ Matthias Klose ]
+  * Build-depend on the unversioned libfreetype-dev.
+  * Backport the openjdk-17 zero support for loong64 (Xuefeng Pan).
+    Closes: #1051906.
+  * Build using GCC 13 on development versions.
+
+  [ Vladimir Petko ]
+  * Fix jquery-min.js symlink. Closes: #998763.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 16 Sep 2023 13:35:34 +0200
+
+openjdk-17 (17.0.9~4ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.9 early access, build 4.
+
+  [ Vladimir Petko ]
   * d/t/jtreg-autopkgtest.{sh,in}: JDK-8232153 - set NSS_DEFAULT_DB_TYPE
     to let sun/security/pkcs11/Secmod/AddTrustedCert.java pass.
-  * d/p/exclude-broken-tests.patch: disable pkcs11 tests failing with
-    NSS 3.91.
-  * d/t/problems-armhf.txt: disable armf tests -
-    java/util/Random/RandomTestBsi1999.java (deadlock in CI),
-    java/net/httpclient/ManyRequestsLegacy.java (SSL request timeout).
-  * Enable jtreg tests for bionic and focal.
+  * d/p/exclude-broken-tests.patch: quarantine pkcs11 tests failing with NSS 3.91.
+  * d/t/problems-armhf.txt: quarantine armhf failing tests:
+    - java/net/httpclient/ManyRequestsLegacy.java: SSL request timeout.
+    - java/util/Random/RandomTestBsi1999.java: deadlock in CI.
+  * d/copyright: Remove liblcms from excluded files.
+  * d/rules: Enable jtreg tests for bionic and focal.
+  * d/p/build_gtest.patch: Update patch to work with earlier versions
+    of google-test.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 24 Aug 2023 11:47:40 +1200
+  [ Matthias Klose ]
+  * Explicitly configure --without-jtreg with the nocheck profile
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 24 Aug 2023 08:29:32 +0200
 
 openjdk-17 (17.0.8+7-1) unstable; urgency=high
 

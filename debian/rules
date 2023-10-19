@@ -57,7 +57,7 @@ multiarch_dir = /$(DEB_HOST_MULTIARCH)
 
 hotspot_archs	= amd64 i386 arm64 armhf ppc64 ppc64el riscv64 s390x
 jtreg_archs	= $(hotspot_archs) alpha ia64 powerpc ppc64 sh4 x32
-jtreg_archs	+= armel mipsel mips64el
+jtreg_archs	+= armel loong64 mipsel mips64el
 jtreg_archs	+= riscv64
 
 # FIXME: use bootcycle builds for zero archs?
@@ -82,6 +82,7 @@ else
 endif
 
 is_upstream_release = yes
+#is_upstream_release =
 
 srcdir		= .
 builddir	= build
@@ -160,7 +161,7 @@ jtreg_pkg = jtreg6
 testng_pkg= libtestng7-java
 
 with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
-ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 mipsel mips64el powerpc x32))
+ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 loong64 mipsel mips64el powerpc x32))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
 ifeq ($(distribution)-$(distrel),Ubuntu-riscv64)
@@ -180,7 +181,7 @@ endif
 
 with_wqy_zenhai = $(if $(filter $(distrel),lenny),,yes)
 
-arch_map	:= alpha=alpha arm=arm armel=arm armhf=arm arm64=aarch64 amd64=amd64 hppa=parisc i386=i586 m68k=m68k mips=mips mipsel=mipsel mips64=mips64 mips64el=mips64el powerpc=ppc ppc64=ppc64 ppc64el=ppc64le riscv64=riscv64 sparc=sparc sparc64=sparcv9 sh4=sh s390x=s390x ia64=ia64 x32=x32
+arch_map	:= alpha=alpha arm=arm armel=arm armhf=arm arm64=aarch64 amd64=amd64 hppa=parisc i386=i586 loong64=loong64 m68k=m68k mips=mips mipsel=mipsel mips64=mips64 mips64el=mips64el powerpc=ppc ppc64=ppc64 ppc64el=ppc64le riscv64=riscv64 sparc=sparc sparc64=sparcv9 sh4=sh s390x=s390x ia64=ia64 x32=x32
 
 jvmarch		:= $(strip $(patsubst $(DEB_HOST_ARCH_CPU)=%, %, \
 			$(filter $(DEB_HOST_ARCH_CPU)=%, $(arch_map))))
@@ -190,7 +191,7 @@ endif
 
 default_vm = $(if $(filter $(DEB_HOST_ARCH), $(hotspot_archs)),hotspot,zero)
 
-any_archs = alpha amd64 armel armhf arm64 i386 ia64 mips mipsel mips64 mips64el powerpc ppc64 ppc64el m68k riscv64 sh4 sparc sparc64 s390x x32
+any_archs = alpha amd64 armel armhf arm64 i386 ia64 loong64 mips mipsel mips64 mips64el powerpc ppc64 ppc64el m68k riscv64 sh4 sparc sparc64 s390x x32
 
 altzero_archs = $(hotspot_archs)
 ifneq (,$(filter $(distrel),trusty))
@@ -272,14 +273,18 @@ else ifneq (,$(filter $(distrel),jammy))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-11
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-11
   bd_gcc = g++-11 <!cross>,
-else
+else ifneq (,$(filter $(distrel),bookworm lunar))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-12
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-12
   bd_gcc = g++-12 <!cross>,
+else
+  export CC = $(DEB_HOST_GNU_TYPE)-gcc-13
+  export CXX = $(DEB_HOST_GNU_TYPE)-g++-13
+  bd_gcc = g++-13 <!cross>,
 endif
 
 # GCC 11 and up
-ifeq (,$(findstring 11 12, $(bd_gcc)))
+ifeq (,$(findstring 11 12 13 14, $(bd_gcc)))
   DEB_BUILD_MAINT_OPTIONS = optimize=-lto
 endif
 
@@ -424,7 +429,7 @@ endif
 ifeq ($(with_check),yes)
   COMMON_CONFIGURE_ARGS += --with-jtreg=/usr/share/jtreg
 else
-  COMMON_CONFIGURE_ARGS += --disable-jtreg-failure-handler
+  COMMON_CONFIGURE_ARGS += --without-jtreg --disable-jtreg-failure-handler
 endif
 
 COMMON_CONFIGURE_ARGS += --disable-warnings-as-errors
@@ -511,11 +516,8 @@ COMMON_CONFIGURE_ARGS += \
 	--disable-javac-server \
 
 ifeq ($(with_check),yes)
-# temporary: disable gtest until compile errors are fixed in jammy
-  ifeq (,$(filter $(distrel),bullseye jammy))
     COMMON_CONFIGURE_ARGS += \
-        --with-gtest=system
-  endif
+        --with-gtest=$(CURDIR)/googletest
 endif
 
 ifeq (,$(filter $(distrel),jessie stretch precise trusty xenial))
@@ -597,7 +599,7 @@ all_tools	=  jar jarsigner java javac javadoc javap jcmd \
 jdk_hl_tools	= jar jarsigner javac javadoc javap jcmd jdb \
 	jdeprscan jdeps jfr jimage jinfo jlink jmap jmod jps \
 	jrunscript jshell jstack jstat jstatd serialver
-ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 m68k mips mipsel mips64el powerpc s390x sh4 sparc64 x32))
+ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 loong64 m68k mips mipsel mips64el powerpc s390x sh4 sparc64 x32))
   all_tools	+= jhsdb
   jdk_hl_tools	+= jhsdb
 endif
@@ -658,9 +660,14 @@ bd_syslibs += \
 	libgif-dev,
 bd_openjdk = \
 	libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, \
-	libasound2-dev, liblcms2-dev, libfreetype6-dev (>= 2.2.1), \
+	libasound2-dev, liblcms2-dev, \
 	libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev, libxrandr-dev, \
 	libelf-dev, libfontconfig1-dev, libgtk2.0-0 | libgtk-3-0,
+ifneq (,$(filter $(distrel),jessie stretch buster precise trusty xenial bionic))
+  bd_openjdk += libfreetype6-dev,
+else
+  bd_openjdk += libfreetype-dev,
+endif
 ifeq ($(with_system_hb),yes)
   bd_openjdk += libharfbuzz-dev,
 endif
@@ -710,8 +717,7 @@ ifeq ($(with_check),yes)
     xvfb$(nocheck_profile), xauth$(nocheck_profile), \
     xfonts-base$(nocheck_profile), libgl1-mesa-dri [!x32]$(nocheck_profile), \
     xfwm4$(nocheck_profile), x11-xkb-utils$(nocheck_profile), \
-    dbus-x11$(nocheck_profile), googletest$(nocheck_profile), \
-    google-mock$(nocheck_profile), xvfb $(nocheck_profile),
+    dbus-x11$(nocheck_profile), xvfb $(nocheck_profile),
 ifeq (,$(filter $(distrel),jessie stretch buster))
     bd_check += libasmtools-java$(nocheck_profile),
 endif
@@ -978,7 +984,7 @@ stamps/configure: stamps/unpack
 
 	mkdir -p bin
 ifeq (0,1)
-ifeq (,$(filter $(DEB_HOST_ARCH), alpha amd64 arm64 hppa mips64 mips64el ppc64 ppc64el s390x sparc64 x32))
+ifeq (,$(filter $(DEB_HOST_ARCH), alpha amd64 arm64 hppa loong64 mips64 mips64el ppc64 ppc64el s390x sparc64 x32))
 	( \
 	  echo '#! /bin/sh'; \
 	  echo 'if [ -x /usr/bin/linux32 ]; then'; \
@@ -1082,7 +1088,7 @@ build: pre-build $(build_stamps)
 
 stamps/build: stamps/configure
 	@echo '========== $@ =========='
-ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel armhf ia64 m68k mips mipsel mips64 mips64el powerpc riscv64 s390x sh4 sparc sparc64))
+ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel armhf ia64 loong64 m68k mips mipsel mips64 mips64el powerpc riscv64 s390x sh4 sparc sparc64))
 	sh -c 'sh debian/buildwatch.sh $(CURDIR)/$(builddir) &'
 endif
 	if $(EXTRA_BUILD_ENV) $(MAKE) --no-print-directory -C $(builddir) $(build_target); then \
@@ -1806,7 +1812,7 @@ ifeq ($(with_docs),yes)
 	done
 	rm -v $(d_doc)/usr/share/doc/$(p_jrehl)/api/script-dir/{jquery-3.6.1.min.js,jquery-ui.min.css,jquery-ui.min.js}
 	dh_link -p$(p_doc) \
-	  /usr/share/javascript/jquery-ui/jquery-ui.min.js \
+	  /usr/share/javascript/jquery/jquery.min.js \
 	    /usr/share/doc/$(p_jrehl)/api/script-dir/jquery-3.6.1.min.js \
 	  /usr/share/javascript/jquery-ui/themes/base/jquery-ui.min.css \
 	    /usr/share/doc/$(p_jrehl)/api/script-dir/jquery-ui.min.css \
@@ -1896,8 +1902,9 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 is_release		= yes
+#is_release		=
 git_project		= jdk17u
-git_tag			= jdk-17.0.8+7
+git_tag			= jdk-17.0.9+9
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_release),yes)
@@ -1906,7 +1913,23 @@ endif
 git_url			= https://github.com/openjdk/$(git_project)
 origdir = ../$(basename)-$(package_version).orig
 topdir = $(basename)-$(package_version)
-get-orig:
+gtest_repo = https://github.com/google/googletest/archive/refs/tags/
+gtest_tag = 1.14.0
+gtestdir = ../$(basename)-$(package_version)-googletest.orig
+
+get-gtest:
+	rm -rf $(gtestdir) || true
+	mkdir $(gtestdir)
+	wget -O $(gtestdir)/googletest.tar.gz $(gtest_repo)/v$(gtest_tag).tar.gz
+	set -ex; \
+	repo=googletest; \
+	d=$$(tar tf $(gtestdir)/$$repo.tar.gz | head -1 | sed 's,/.*,,'); \
+	tar xf $(gtestdir)/$$repo.tar.gz; \
+	XZ_OPT=-9v tar cfJ ../$(basename)_$(package_version).orig-$$repo.tar.xz googletest-${gtest_tag}; \
+	rm -rf $(gtestdir)
+	rm -rf googletest-${gtest_tag}
+
+get-orig: get-gtest
 	mkdir $(origdir)
 	wget -O $(origdir)/jdk.tar.gz $(git_url)/archive/$(git_tag).tar.gz
 
