@@ -1091,7 +1091,7 @@ AC_DEFUN_ONCE([TOOLCHAIN_SETUP_JTREG],
     AC_MSG_CHECKING([jtreg version number])
     # jtreg -version looks like this: "jtreg 6.1+1-19"
     # Extract actual version part ("6.1" in this case)
-    jtreg_version_full=`$JAVA -jar $JT_HOME/lib/jtreg.jar -version | $HEAD -n 1 | $CUT -d ' ' -f 2`
+    jtreg_version_full=`$JAVA -jar $JT_HOME/lib/jtreg.jar -version | $HEAD -n 1 | $CUT -d ' ' -f 3`
     jtreg_version=${jtreg_version_full/%+*}
     AC_MSG_RESULT([$jtreg_version])
 
