@@ -1,12 +1,67 @@
-openjdk-17 (17.0.9+9-1~22.04) jammy-security; urgency=high
+openjdk-17 (17.0.10+7-1~22.04.1) jammy-security; urgency=high
 
-  * Upload to Ubuntu 22.04.
-  * Release notes correction:
-    - CVE-2023-22081, CVE-2023-22025.
-    - Release notes:
-      https://mail.openjdk.org/pipermail/jdk-updates-dev/2023-October/026352.html
+  * OpenJDK 17.0.10 release, build 7.
+    - CVEs:
+      + CVE-2024-20918
+      + CVE-2024-20919
+      + CVE-2024-20921
+      + CVE-2024-20932
+      + CVE-2024-20945
+      + CVE-2024-20952
+    - Security fixes:
+      + JDK-8276123, JDK-8316613: ZipFile::getEntry will not return a file entry
+        when there is a directory entry of the same name within a Zip File.
+      + JDK-8308204: Enhanced certificate processing.
+      + JDK-8314295: Enhance verification of verifier.
+      + JDK-8314307: Improve loop handling.
+      + JDK-8314468: Improve Compiler loops.
+      + JDK-8316976: Improve signature handling.
+      + JDK-8317547: Enhance TLS connection support.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 19 Oct 2023 20:43:47 +1300
+  [ Vladimir Petko ]
+  * d/t/jtreg-autopkgtest.sh: Regenerate test script.
+  * Generate d/watch to cope with early access and release builds.
+  * d/rules: Trim trailing whitespaces from debian/control.
+
+  [ Matthias Klose ]
+  * Build again zero on amd64 (accidental change in 6ea-1).
+
+  [ Pushkar Kulkarni ]
+  * Minor improvements to the copyright-generator.
+
+  [ Pushkar Kulkarni ]
+  * Upload to Ubuntu 22.04
+  * d/rules, d/control: relax jtreg version check for repacked orig tarballs
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 17 Jan 2024 12:09:47 +0100
+
+openjdk-17 (17.0.10~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.10 early access, build 6.
+
+  [ Pushkar Kulkarni ]
+  * debian/copyright: Fix whitespace issues.
+
+  [ Vladimir Petko ]
+  * d/copyright: Fix lintian warning.
+
+  [ Matthias Klose ]
+  * d/copyright: Fix source location.
+  * Build-depend on jtreg7 instead of jtreg6.
+  * d/p/googletest-version.diff: Ignore the version check, keep 1.14.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 26 Dec 2023 13:18:48 +0100
+
+openjdk-17 (17.0.9+9-2) unstable; urgency=medium
+
+  [ Vladimir Petko ]
+  * d/t/write-problems: Add missing file to generate the problem list.
+
+  [ Pushkar Kulkarni ]
+  * debian/copyright: Update copyrights and notices, using a generator script.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 02 Nov 2023 11:23:27 +0100
 
 openjdk-17 (17.0.9+9-1) unstable; urgency=high
 

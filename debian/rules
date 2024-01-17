@@ -82,7 +82,6 @@ else
 endif
 
 is_upstream_release = yes
-#is_upstream_release =
 
 srcdir		= .
 builddir	= build
@@ -157,7 +156,7 @@ ifneq (,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
   NJOBS = $(subst parallel=,,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
 endif
 
-jtreg_pkg = jtreg6
+jtreg_pkg = jtreg7
 testng_pkg= libtestng7-java
 
 with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
@@ -709,7 +708,7 @@ ifeq (,$(filter $(distrel),precise))
 endif
 
 # look at all TEST.ROOT for the required jtreg version, sorted by newest
-min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:-0~:' | sort -uVr | head -n1 | tr ' ' '-')
+min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:~:' | sort -uVr | head -n1 | tr ' ' '-')
 
 ifeq ($(with_check),yes)
   bd_check = \
@@ -880,7 +879,7 @@ ifneq ($(with_debugedit),yes)
   control_vars += '-Vdbg:Conflicts=openjdk-11-dbg, openjdk-12-dbg, openjdk-13-dbg, openjdk-14-dbg, openjdk-15-dbg, openjdk-16-dbg'
 endif
 
-debian/control: debian/control.in debian/tests/control debian/rules
+debian/control: debian/control.in debian/tests/control debian/rules debian/watch
 	@cp -p debian/control debian/control.old
 	sed \
 	      -e 's/@basename@/$(basename)/g' \
@@ -908,6 +907,7 @@ debian/control: debian/control.in debian/tests/control debian/rules
 	    $(if $(altzero_archs), debian/control.zero-jre) \
 	    $(if $(DEB_HOST_MULTIARCH),,| grep -v '^Multi-Arch') \
 		> debian/control
+	sed -i 's/[[:blank:]]*$$//' debian/control
 	@if cmp -s debian/control debian/control.old; then \
 	  rm -f debian/control.old; \
 	else \
@@ -1238,7 +1238,7 @@ debian-clean:
 	dh_prep
 	for f in debian/*.in; do \
 	  f2=$$(echo $$f | sed 's/JB/$(basename)/;s/\.in$$//'); \
-	  case "$$f2" in debian/control) continue; esac; \
+	  case "$$f2" in debian/control|debian/watch) continue; esac; \
 	  rm -f $$f2; \
 	done
 	rm -f debian/*.install debian/*.links debian/*.debhelper.log
@@ -1901,26 +1901,36 @@ endif
 	NO_PKG_MANGLE=1 \
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
-is_release		= yes
-#is_release		=
 git_project		= jdk17u
-git_tag			= jdk-17.0.9+9
+git_tag			= jdk-17.0.10+7
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
-ifneq ($(is_release),yes)
+ifneq ($(is_upstream_release),yes)
   package_version	:= $(subst +,~,$(package_version))
 endif
 git_url			= https://github.com/openjdk/$(git_project)
 origdir = ../$(basename)-$(package_version).orig
 topdir = $(basename)-$(package_version)
-gtest_repo = https://github.com/google/googletest/archive/refs/tags/
+gtest_repo = https://github.com/google/googletest
 gtest_tag = 1.14.0
 gtestdir = ../$(basename)-$(package_version)-googletest.orig
+
+debian/watch: debian/watch.in debian/rules
+	sed \
+		-e 's|@git_url@|$(git_url)/tags|g' \
+		-e 's|@gtest_repo@|$(gtest_repo)/tags|g' \
+		-e 's|@gtest_tag@|$(gtest_tag)|g' \
+		-e 's|@shortver@|$(shortver)|g' \
+		debian/watch.in > debian/watch
+# disable version mangling for the release version
+ifeq ($(is_upstream_release),yes)
+	sed -i 's|repack.*\\|repack,\\|g' debian/watch
+endif
 
 get-gtest:
 	rm -rf $(gtestdir) || true
 	mkdir $(gtestdir)
-	wget -O $(gtestdir)/googletest.tar.gz $(gtest_repo)/v$(gtest_tag).tar.gz
+	wget -O $(gtestdir)/googletest.tar.gz $(gtest_repo)/archive/refs/tags/v$(gtest_tag).tar.gz
 	set -ex; \
 	repo=googletest; \
 	d=$$(tar tf $(gtestdir)/$$repo.tar.gz | head -1 | sed 's,/.*,,'); \
