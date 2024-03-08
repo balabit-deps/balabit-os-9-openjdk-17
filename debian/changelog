@@ -1,3 +1,9 @@
+openjdk-17 (17.0.10+7-1~22.04.1bb1) jammy; urgency=medium
+
+  * Balabit patched version
+
+ -- Balabit Platform Team <devnull@dev.null>  Fri, 08 Mar 2024 16:23:28 +0100
+
 openjdk-17 (17.0.10+7-1~22.04.1) jammy-security; urgency=high
 
   * OpenJDK 17.0.10 release, build 7.
