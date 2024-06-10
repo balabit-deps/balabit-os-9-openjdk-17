@@ -176,7 +176,7 @@ with_docs = $(if $(findstring nodoc, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(filter $(distrel), precise trusty))
   with_docs =
 endif
-#with_check = disabled for this upload
+with_check = disabled for this upload
 
 with_wqy_zenhai = $(if $(filter $(distrel),lenny),,yes)
 
@@ -473,7 +473,7 @@ ifeq ($(distribution),Debian)
 	--with-vendor-bug-url='https://bugs.debian.org/$(basename)' \
 	--with-vendor-vm-bug-url='https://bugs.debian.org/$(basename)'
 else ifeq ($(distribution),Ubuntu)
-  ppa_build := $(shell if echo 'v_pkgrel' | egrep '^[0-9]+(ubuntu[0-9]+)?(~[0-9.]+)?$$'; then echo no; else echo yes; fi)
+  ppa_build := $(shell if echo '$(v_pkgrel)' | egrep '^[0-9]+(ubuntu[0-9]+)?(~[0-9.]+)?$$'; then echo no; else echo yes; fi)
   ifeq ($(ppa_build),yes)
     COMMON_CONFIGURE_ARGS += \
 	--with-vendor-name='Private Build' \
@@ -598,10 +598,18 @@ all_tools	=  jar jarsigner java javac javadoc javap jcmd \
 jdk_hl_tools	= jar jarsigner javac javadoc javap jcmd jdb \
 	jdeprscan jdeps jfr jimage jinfo jlink jmap jmod jps \
 	jrunscript jshell jstack jstat jstatd serialver
-ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 loong64 m68k mips mipsel mips64el powerpc s390x sh4 sparc64 x32))
+ifeq (,$(filter $(DEB_HOST_ARCH), alpha armel armhf ia64 loong64 m68k mips mipsel mips64el powerpc s390x sh4 sparc64 x32))
   all_tools	+= jhsdb
   jdk_hl_tools	+= jhsdb
 endif
+
+ifeq ($(DEB_HOST_ARCH),armhf)
+	ifneq (,$(filter armhf,$(hotspot_archs)))
+		all_tools	+= jhsdb
+		jdk_hl_tools	+= jhsdb
+	endif
+endif
+
 jdk_tools	= jconsole
 
 all_jre_tools	= $(filter-out $(jdk_hl_tools) $(jdk_tools), $(all_tools))
@@ -661,7 +669,15 @@ bd_openjdk = \
 	libxtst-dev, libxi-dev, libxt-dev, libxaw7-dev, libxrender-dev, libcups2-dev, \
 	libasound2-dev, liblcms2-dev, \
 	libxinerama-dev, libkrb5-dev, xsltproc, libpcsclite-dev, libxrandr-dev, \
-	libelf-dev, libfontconfig1-dev, libgtk2.0-0 | libgtk-3-0,
+	libelf-dev,
+# not needed?
+#bd_openjdk += libgtk2.0-0 | libgtk-3-0,
+#bd_openjdk += libgtk2.0-0t64 | libgtk-3-0t64,
+ifneq (,$(filter $(distrel),jessie stretch buster precise trusty xenial bionic focal))
+  bd_openjdk += libfontconfig1-dev,
+else
+  bd_openjdk += libfontconfig-dev,
+endif
 ifneq (,$(filter $(distrel),jessie stretch buster precise trusty xenial bionic))
   bd_openjdk += libfreetype6-dev,
 else
@@ -708,7 +724,7 @@ ifeq (,$(filter $(distrel),precise))
 endif
 
 # look at all TEST.ROOT for the required jtreg version, sorted by newest
-min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:~:' | sort -uVr | head -n1 | tr ' ' '-')
+min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:-0~:' | sort -uVr | head -n1 | tr ' ' '-')
 
 ifeq ($(with_check),yes)
   bd_check = \
@@ -724,8 +740,22 @@ else
   bd_check = file,
 endif
 
-dlopen_hl_depends = \
-	libcups2, liblcms2-2,
+ifeq (,$(filter $(distrel),squeeze wheezy jessie stretch buster bullseye bookworm lucid precise trusty xenial bionic focal jammy lunar mantic))
+  t64_suffix = t64
+endif
+
+dlopen_hl_depends =
+dlopen_hl_recommends =
+
+ifeq (,$(t64_suffix))
+  dlopen_hl_depends += libcups2,
+  dlopen_hl_depends += libfontconfig1,
+else
+  dlopen_hl_recommends += libcups2$(t64_suffix),
+  dlopen_hl_recommends += libfontconfig1,
+endif
+dlopen_hl_depends += liblcms2-2,
+
 ifeq ($(derivative),Ubuntu)
   ifneq (,$(filter $(distrel),lucid))
     dlopen_hl_depends += libjpeg62,
@@ -739,7 +769,6 @@ else
     dlopen_hl_depends += libjpeg62-turbo,
   endif
 endif
-dlopen_hl_depends += libfontconfig1,
 ifneq ($(with_nss),no)
   ifneq (,$(filter $(distrel),squeeze lucid precise))
     dlopen_hl_depends += , libnss3-1d (>= 3.12.3)
@@ -749,9 +778,17 @@ ifneq ($(with_nss),no)
     dlopen_hl_depends += , libnss3 (>= 2:3.17.1)
   endif
 endif
-dlopen_hl_recommends =
-dlopen_jre_depends = \
-	libglib2.0-0 (>= 2.24), libgtk2.0-0 | libgtk-3-0, libxrandr2, libxinerama1,
+
+dlopen_jre_depends =
+dlopen_jre_recommends =
+ifeq (,$(t64_suffix))
+  dlopen_jre_depends += libglib2.0-0 (>= 2.24),
+  dlopen_jre_depends += libgtk2.0-0 | libgtk-3-0,
+else
+  dlopen_jre_depends += libglib2.0-0t64 (>= 2.24),
+  dlopen_jre_depends += libgtk2.0-0t64 | libgtk-3-0t64,
+endif
+dlopen_jre_depends += libxrandr2, libxinerama1,
 ifneq (,$(filter $(distrel),squeeze wheezy jessie stretch lucid precise xenial))
   dlopen_jre_depends += libgl1-mesa-glx | libgl1,
 else
@@ -760,7 +797,12 @@ endif
 ifeq ($(with_system_hb),yes)
   dlopen_jre_depends += libharfbuzz0b,
 endif
-dlopen_jre_recommends =
+ifeq (,$(findstring libcups, $(dlopen_hl_depends)))
+  dlopen_jre_depends += libcups2$(t64_suffix),
+endif
+ifeq (,$(findstring libfontconfig, $(dlopen_hl_depends)))
+  dlopen_jre_depends += libfontconfig1,
+endif
 
 # .desktop files need to be multiarch installable
 java_launcher = /$(basedir)/bin/java
@@ -936,7 +978,7 @@ gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh debian/tests/jtreg-autopkgt
 
 packaging-files:
 	for f in debian/*.in; do \
-	  case "$$f" in debian/control.in) continue; esac; \
+	  case "$$f" in debian/control.in|debian/watch.in) continue; esac; \
 	  f2=$$(echo $$f | sed 's/JB/$(basename)/;s/\.in$$//'); \
 	  sed -e 's/@JRE@/$(p_jre)/g' \
 	      -e 's/@JDK@/$(p_jdk)/g' \
@@ -1888,9 +1930,24 @@ endif
 	dh_compress -a $(nodemo) $(nojrez) -Xexamples -Xdemo -Xpackage-list
 	dh_fixperms -a $(nodemo) $(nojrez)
 	dh_makeshlibs -p$(p_jrehl) -p$(p_jre)
+ifneq (,$(filter $(distrel),squeeze wheezy jessie stretch buster bullseye bookworm lucid precise trusty xenial bionic focal jammy lunar mantic))
 	dh_shlibdeps -a $(nodemo) $(nojrez) -L $(p_jrehl) \
 		-l$(shlibdeps_ld_path) \
 		--
+else
+	dh_shlibdeps -a $(nodemo) $(nojrez) -L $(p_jrehl) \
+		-Xlibfontmanager -Xlibjsound \
+		-l$(shlibdeps_ld_path) \
+		--
+	dpkg-shlibdeps -pfontmanager -dRecommends -T$(d_jrehl).substvars \
+		$(d_jrehl)/$(basedir)/lib/libfontmanager.so
+	dpkg-shlibdeps -pfontmanager -T$(d_jre).substvars \
+		$(d_jrehl)/$(basedir)/lib/libfontmanager.so
+	dpkg-shlibdeps -pjsound -dRecommends -T$(d_jrehl).substvars \
+		$(d_jrehl)/$(basedir)/lib/libjsound.so
+	dpkg-shlibdeps -pjsound -T$(d_jre).substvars \
+		$(d_jrehl)/$(basedir)/lib/libjsound.so
+endif
 	find $(d_jrehl) $(d_jre) $(d_jrez) -type f -name '*.debuginfo'
 	dh_installdeb -a $(nodemo) $(nojrez)
 	dh_gencontrol -a $(nodemo) $(nojrez) \
@@ -1902,7 +1959,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.10+7
+git_tag			= jdk-17.0.11+9
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)
