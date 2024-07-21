@@ -3,6 +3,7 @@
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
+include /usr/share/dpkg/buildflags.mk
 
 unexport LANG LC_ALL
 
@@ -176,7 +177,7 @@ with_docs = $(if $(findstring nodoc, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(filter $(distrel), precise trusty))
   with_docs =
 endif
-with_check = disabled for this upload
+#with_check = disabled for this upload
 
 with_wqy_zenhai = $(if $(filter $(distrel),lenny),,yes)
 
@@ -260,11 +261,7 @@ else ifneq (,$(filter $(distrel),buster precise trusty xenial bionic cosmic disc
   ifneq (,$(filter $(distrel),buster bionic cosmic disco))
     bd_gcc = g++-8 <!cross>,
   endif
-else ifneq (,$(filter $(distrel),focal))
-  export CC = $(DEB_HOST_GNU_TYPE)-gcc-9
-  export CXX = $(DEB_HOST_GNU_TYPE)-g++-9
-  bd_gcc = g++-9 <!cross>,
-else ifneq (,$(filter $(distrel),bullseye groovy hirsute))
+else ifneq (,$(filter $(distrel),bullseye focal groovy hirsute))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-10
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-10
   bd_gcc = g++-10 <!cross>,
@@ -276,10 +273,14 @@ else ifneq (,$(filter $(distrel),bookworm lunar))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-12
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-12
   bd_gcc = g++-12 <!cross>,
-else
+else ifneq (,$(filter $(distrel),mantic noble))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-13
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-13
   bd_gcc = g++-13 <!cross>,
+else
+  export CC = $(DEB_HOST_GNU_TYPE)-gcc-14
+  export CXX = $(DEB_HOST_GNU_TYPE)-g++-14
+  bd_gcc = g++-14 <!cross>,
 endif
 
 # GCC 11 and up
@@ -724,7 +725,7 @@ ifeq (,$(filter $(distrel),precise))
 endif
 
 # look at all TEST.ROOT for the required jtreg version, sorted by newest
-min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:-0~:' | sort -uVr | head -n1 | tr ' ' '-')
+min_jtreg_version := $(shell find test/ -name TEST.ROOT -exec grep -hr "^requiredVersion=" {} \; | sed -e 's:^requiredVersion=::' -e 's:$$:~:' | sort -uVr | head -n1 | tr ' ' '-')
 
 ifeq ($(with_check),yes)
   bd_check = \
@@ -967,6 +968,7 @@ debian/tests/control: debian/tests/control.in debian/rules
 
 debian/tests/%.sh: debian/tests/%.in debian/rules
 	sed \
+		-e 's/@basename@/$(basename)/g' \
 		-e 's,@JDK_DIR@,/$(basedir),g' \
 		-e 's,@jtreg_pkg@,$(jtreg_pkg),g' \
 		-e 's/@jtreg_archs@/$(jtreg_archs)/g' \
@@ -974,7 +976,9 @@ debian/tests/%.sh: debian/tests/%.in debian/rules
 		$< > $@;
 	chmod +x $@
 
-gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh debian/tests/jtreg-autopkgtest.sh
+gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh \
+	debian/tests/jtreg-autopkgtest.sh \
+	debian/tests/write-problems.sh
 
 packaging-files:
 	for f in debian/*.in; do \
@@ -1959,7 +1963,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.11+9
+git_tag			= jdk-17.0.12+7
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)

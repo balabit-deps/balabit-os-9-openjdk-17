@@ -1,30 +1,107 @@
-openjdk-17 (17.0.11+9-1~22.04.1) jammy-security; urgency=medium
+openjdk-17 (17.0.12+7-1ubuntu2~22.04) jammy-security; urgency=medium
 
-  * Modify the previous changelog entry:
-       remove an invalid entry from the CVE list.
+  * Upload to Ubuntu 22.04.
 
- -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Wed, 29 May 2024 17:12:42 +0530
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 22 Jul 2024 08:56:25 +1200
 
-openjdk-17 (17.0.11+9-1~22.04) jammy-security; urgency=high
+openjdk-17 (17.0.12+7-1ubuntu2) oracular; urgency=medium
+
+  * OpenJDK 17.0.12 release, build 7. Release notes:
+    https://mail.openjdk.org/pipermail/jdk-updates-dev/2024-July/035798.html
+    - CVEs:
+      + CVE-2024-21147: 8323231, RangeCheckElimination array index overflow.
+      + CVE-2024-21145: 8324559, Out-of-bounds access in 2D image handling.
+      + CVE-2024-21140: 8320548, Range Check Elimination (RCE) pre-loop limit
+        overflow.
+      + CVE-2024-21131: 8314794, potential UTF8 size overflow.
+      + CVE-2024-21138: 8319859, Excessive symbol length can lead to infinite loop.
+    - Security Fixes:
+      + JDK-8303466: C2: failed: malformed control flow. Limit type made precise
+        with MaxL/MinL.
+      + JDK-8314794: Improve UTF8 String supports.
+      + JDK-8319859: Better symbol storage.
+      + JDK-8320097: Improve Image transformations.
+      + JDK-8320548: Improved loop handling.
+      + JDK-8323231: Improve array management.
+      + JDK-8323390: Enhance mask blit functionality.
+      + JDK-8324559: Improve 2D image handling.
+      + JDK-8325600: Better symbol storage.
+      + JDK-8327413: Enhance compilation efficiency.
+  * No-Change upload to include upstream release notes.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 22 Jul 2024 08:28:43 +1200
+
+openjdk-17 (17.0.12+7-1ubuntu1) oracular; urgency=medium
+
+  * OpenJDK 17.0.12 release, build 7.
+    - CVEs:
+        + CVE-2024-21147
+        + CVE-2024-21145
+        + CVE-2024-21140
+        + CVE-2024-21131
+        + CVE-2024-21138
+    - Security Fixes:
+        + JDK-8316138: Added GlobalSign R46 and E46 Root CA Certificates.
+        + JDK-8256660: Disabled DTLS 1.0.
+        + JDK-8326891: Native Executables and Libraries on Linux Use
+          RPATH Instead of RUNPATH.
+  * d/p/jdk-8312488.patch: add upstream patch to resolve jpackage crash.
+  * d/copyright: regenerate copyright.
+  * d/rules, d/t/*: collate all excluded tests into d/t/problemlist.csv.
+  * d/rules: enable fallback linker for Foreign Function and Memory API
+    on i386 and armhf.
+  * d/watch: use fixed googletest version.
+  * d/p/jdk-8336529-proposed.patch: fix time_t migration issue on armhf
+    openjdk is unable to set file last modified timestamp.
+  * d/p/jdk-8334895-proposed.patch: refresh patch.
+  * d/rules: relax jtreg7 version condition for backports.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 19 Jul 2024 08:41:21 +1200
+
+openjdk-17 (17.0.12+7-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.12 release, build 7.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 17 Jul 2024 13:02:09 +0200
+
+openjdk-17 (17.0.12~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.12 early access, build 6.
+
+  [ Vladimir Petko ]
+  * d/p/8295111.patch: Apply upstream patch to resolve jpackage failure
+    to create a deb package.
+  * d/t/problems-i386.txt: Update i386 test exclusions.
+  * d/t/problems-armhf.txt: Update armhf test exclusions.
+  * d/p/jdk-8307977.patch: Rename patch.
+  * d/p/jdk-8334502-proposed.patch: Add proposed fix for iso8601 time format
+    on ARM32.
+  * d/p/jdk-8334895-proposed.patch: Add proposed fix for configuration failure
+    when CDS is disabled on arm64.
+  * d/control: Regenerate control.
+  * d/rules: Enable early access release.
+  * d/rules: Enable jtreg tests.
+  * d/rules: Include /usr/share/dpkg/buildflags.mk to avoid configure failure
+    due to the undefined variables.
+  * d/p/jdk-8325567.patch: jspawnhelper without args fails with segfault.
+    LP: #2055280.
+  * d/p/jdk-8331541.patch: Add fix for the link failure against libjvm.so on
+    i386. Closes: #1057715.
+
+  [ Matthias Klose ]
+  * Build using GCC 10 for focal.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 29 Jun 2024 09:05:11 +0200
+
+openjdk-17 (17.0.11+9-1) unstable; urgency=high
 
   * OpenJDK 17.0.11 release, build 9.
-
-    * CVEs
     - CVE-2024-21011, 8319851: Improve exception logging.
     - CVE-2024-21068, 8322122: Enhance generation of addresses.
+    - 8318340: Improve RSA key implementations.
     - CVE-2024-21012, 8315708: Enhance HTTP/2 client usage.
-    - CVE-2024-21094, 8317507: Already fixed in November 2023:
-        C2 compilation fails with "Exceeded _node_regs array".
-
-    * Security fixes
-    - JDK-8315708: Enhance HTTP/2 client usage
-    - JDK-8317507, JDK-8325348: C2 compilation fails with "Exceeded _node_regs array"
-    - JDK-8318340: Improve RSA key implementations
-    - JDK-8319851: Improve exception logging
-    - JDK-8322122: Enhance generation of addresses
-
-  [ Pushkar Kulkarni ]
-  * Upload to Ubuntu 22.04
+  * CVE-2024-21094, 8317507: Already fixed in November 2023:
+    C2 compilation fails with "Exceeded _node_regs array".
 
  -- Matthias Klose <doko@ubuntu.com>  Wed, 17 Apr 2024 14:24:58 +0200
 
@@ -129,7 +206,7 @@ openjdk-17 (17.0.9+9-2) unstable; urgency=medium
 openjdk-17 (17.0.9+9-1) unstable; urgency=high
 
   * OpenJDK 17.0.9 release, build 9.
-    - CVE-2023-30589, CVE-2023-22081, CVE-2023-22091, CVE-2023-22025.	
+    - CVE-2023-30589, CVE-2023-22081, CVE-2023-22091, CVE-2023-22025.
       The patch for CVE-2023-30589 also addresses CVE-2023-30585,
       CVE-2023-30588, and CVE-2023-30590.
     - Release notes:
@@ -5695,4 +5772,3 @@ icedtea (7~b14-20070704-1) unstable; urgency=low
   * Initial version.
 
  -- Michael Koch <konqueror@gmx.de>  Wed, 04 Jul 2007 08:25:31 -0100
-
