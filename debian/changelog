@@ -1,66 +1,90 @@
-openjdk-17 (17.0.12+7-1ubuntu2~22.04) jammy-security; urgency=medium
+openjdk-17 (17.0.13+11-2ubuntu1~22.04) jammy-security; urgency=medium
 
-  * Upload to Ubuntu 22.04.
+  * d/rules: Add CFLAG to avert FTBFS on armhf due
+    to GCC-11 ICE reported by LP-1953128
+  * d/control: Regenerate for upload to Ubuntu 22.04
+  * d/changelog: append additional CVE information to
+    17.0.13+11 changelog entry
+  * Upload to Ubuntu 22.04
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 22 Jul 2024 08:56:25 +1200
+ -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Tue, 22 Oct 2024 11:39:56 +0530
 
-openjdk-17 (17.0.12+7-1ubuntu2) oracular; urgency=medium
+openjdk-17 (17.0.13+11-2) unstable; urgency=high
 
-  * OpenJDK 17.0.12 release, build 7. Release notes:
-    https://mail.openjdk.org/pipermail/jdk-updates-dev/2024-July/035798.html
-    - CVEs:
-      + CVE-2024-21147: 8323231, RangeCheckElimination array index overflow.
-      + CVE-2024-21145: 8324559, Out-of-bounds access in 2D image handling.
-      + CVE-2024-21140: 8320548, Range Check Elimination (RCE) pre-loop limit
-        overflow.
-      + CVE-2024-21131: 8314794, potential UTF8 size overflow.
-      + CVE-2024-21138: 8319859, Excessive symbol length can lead to infinite loop.
-    - Security Fixes:
-      + JDK-8303466: C2: failed: malformed control flow. Limit type made precise
-        with MaxL/MinL.
-      + JDK-8314794: Improve UTF8 String supports.
-      + JDK-8319859: Better symbol storage.
-      + JDK-8320097: Improve Image transformations.
-      + JDK-8320548: Improved loop handling.
-      + JDK-8323231: Improve array management.
-      + JDK-8323390: Enhance mask blit functionality.
-      + JDK-8324559: Improve 2D image handling.
-      + JDK-8325600: Better symbol storage.
-      + JDK-8327413: Enhance compilation efficiency.
-  * No-Change upload to include upstream release notes.
+  * Don't enable dtrace on POWER* architectures.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 22 Jul 2024 08:28:43 +1200
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 17 Oct 2024 10:59:51 +0200
 
-openjdk-17 (17.0.12+7-1ubuntu1) oracular; urgency=medium
+openjdk-17 (17.0.13+11-1) unstable; urgency=high
 
-  * OpenJDK 17.0.12 release, build 7.
-    - CVEs:
-        + CVE-2024-21147
-        + CVE-2024-21145
-        + CVE-2024-21140
-        + CVE-2024-21131
-        + CVE-2024-21138
-    - Security Fixes:
-        + JDK-8316138: Added GlobalSign R46 and E46 Root CA Certificates.
-        + JDK-8256660: Disabled DTLS 1.0.
-        + JDK-8326891: Native Executables and Libraries on Linux Use
-          RPATH Instead of RUNPATH.
-  * d/p/jdk-8312488.patch: add upstream patch to resolve jpackage crash.
-  * d/copyright: regenerate copyright.
-  * d/rules, d/t/*: collate all excluded tests into d/t/problemlist.csv.
-  * d/rules: enable fallback linker for Foreign Function and Memory API
+  * OpenJDK 17.0.13 release, build 11.
+
+    - CVEs
+      + CVE-2024-21208, 8328286: Enhance HTTP client
+      + CVE-2024-21210, 8328544: Improve handling of vectorization
+      + CVE-2024-21217, 8331446: Improve deserialization support
+      + CVE-2024-21235, 8332644: Improve graph optimizations
+
+  [ Vladimir Petko ]
+  * d/rules: do not include dtrace support for S390x (JDK-8305174).
+  * d/t/problems.csv: Disable jdk/sun/security/util/Debug/DebugOptions.java
+    due to JDK-8339713.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 16 Oct 2024 12:01:58 +0200
+
+openjdk-17 (17.0.13~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.13 early access, build 6.
+
+  [ Vladimir Petko ]
+  * d/copyright-generator/strip-common-licenses.sh: Add GPLv3 to the
+    list of common licenses.
+  * d/JB-*.override.in: Update lintian overrides.
+  * d/s/lintian-override: Add source-contains-prebuilt-javascript-object
+    due to LP: 2032992.
+  * d/p/jdk-8334895-proposed.patch: Fix typo in the patch description.
+  * d/t/problemlist.csv: Update problemlist.csv for July release
+  * d/t/jtreg-autopkgtest.{in,sh}: Increase jtreg test timeouts.
+  * Enable dtrace support.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 09 Sep 2024 15:48:20 +0200
+
+openjdk-17 (17.0.12+7-2) unstable; urgency=medium
+
+  [ Vladimir Petko ]
+  * d/p/jdk-8312488.patch: Add upstream patch to resolve jpackage crash.
+  * d/copyright: Regenerate copyright.
+  * d/rules, d/t/*: Collate all excluded tests into d/t/problemlist.csv.
+  * d/rules: Enable fallback linker for Foreign Function and Memory API
     on i386 and armhf.
-  * d/watch: use fixed googletest version.
-  * d/p/jdk-8336529-proposed.patch: fix time_t migration issue on armhf
+  * d/watch: Use fixed googletest version.
+  * d/p/jdk-8336529-proposed.patch: Fix time_t migration issue on armhf.
     openjdk is unable to set file last modified timestamp.
-  * d/p/jdk-8334895-proposed.patch: refresh patch.
-  * d/rules: relax jtreg7 version condition for backports.
+  * d/p/jdk-8334895-proposed.patch: Refresh patch.
+  * d/rules: Relax jtreg7 version condition for backports.
+  * d/rules, d/control.in: Depend on pkgconf rather than pkg-config in
+    bookworm and later releases. This resolves lintian warning
+    build-depends-on-obsolete-package Build-Depends: pkg-config => pkgconf.
+  * d/rules: Drop autotools-dev dependency for the modern debhelper.
+    This resolves obsolete autotools-dev dependency lintian warning.
+    See #844191.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 19 Jul 2024 08:41:21 +1200
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 30 Jul 2024 08:42:49 +0200
 
 openjdk-17 (17.0.12+7-1) unstable; urgency=medium
 
   * OpenJDK 17.0.12 release, build 7.
+    - CVEs:
+      + CVE-2024-21147
+      + CVE-2024-21145
+      + CVE-2024-21140
+      + CVE-2024-21131
+      + CVE-2024-21138
+    - Security Fixes:
+      + JDK-8316138: Added GlobalSign R46 and E46 root CA certificates.
+      + JDK-8256660: Disabled DTLS 1.0.
+      + JDK-8326891: Native executables and libraries on Linux use
+        RPATH instead of RUNPATH.
 
  -- Matthias Klose <doko@ubuntu.com>  Wed, 17 Jul 2024 13:02:09 +0200
 
