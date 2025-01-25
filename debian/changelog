@@ -1,13 +1,40 @@
-openjdk-17 (17.0.13+11-2ubuntu1~22.04) jammy-security; urgency=medium
+openjdk-17 (17.0.14+7-1~22.04.1) jammy-security; urgency=medium
 
-  * d/rules: Add CFLAG to avert FTBFS on armhf due
-    to GCC-11 ICE reported by LP-1953128
-  * d/control: Regenerate for upload to Ubuntu 22.04
-  * d/changelog: append additional CVE information to
-    17.0.13+11 changelog entry
-  * Upload to Ubuntu 22.04
+  * Upload to Ubuntu 22.04.
+  * d/rules: disable dtrace on jammy armhf (LP: #2091226).
+  * d/t/problems.csv: fix typo - remove jdk prefix for
+    sun/security/util/Debug/DebugOptions.java.
 
- -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Tue, 22 Oct 2024 11:39:56 +0530
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Sat, 25 Jan 2025 14:06:32 +1300
+
+openjdk-17 (17.0.14+7-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.14 release, build 7. Release notes:
+    https://mail.openjdk.org/pipermail/jdk-updates-dev/2025-January/040827.html
+
+    - CVEs:
+      + CVE-2025-21502 - 8330045: Enhance array handling.
+
+  [ Vladimir Petko ]
+  * d/rules: Dump complete hs_err_pid and replay_pid logs to stdout.
+  * d/t/problems.csv: Add openjdk-24 and openjdk-25 to the problems.csv.
+  * d/rules: Create link to jquery-3.7.1.min.js instead of jquery-3.6.1.min.js
+    (LP: #2095455).
+  * d/copyright: Regenerate.
+
+  [ Matthias Klose ]
+  * d/rules: Also dump logs for zero builds and for build failures.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 22 Jan 2025 10:17:58 +0100
+
+openjdk-17 (17.0.14~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.14 early access, build 6.
+
+  [ Pushkar Kulkarni ]
+  * d/t/problems.csv: Update based on recent JTREG runs.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 20 Dec 2024 11:09:22 +0100
 
 openjdk-17 (17.0.13+11-2) unstable; urgency=high
 
@@ -18,12 +45,10 @@ openjdk-17 (17.0.13+11-2) unstable; urgency=high
 openjdk-17 (17.0.13+11-1) unstable; urgency=high
 
   * OpenJDK 17.0.13 release, build 11.
-
-    - CVEs
-      + CVE-2024-21208, 8328286: Enhance HTTP client
-      + CVE-2024-21210, 8328544: Improve handling of vectorization
-      + CVE-2024-21217, 8331446: Improve deserialization support
-      + CVE-2024-21235, 8332644: Improve graph optimizations
+    - CVE-2024-21208
+    - CVE-2024-21210
+    - CVE-2024-21217
+    - CVE-2024-21235
 
   [ Vladimir Petko ]
   * d/rules: do not include dtrace support for S390x (JDK-8305174).
