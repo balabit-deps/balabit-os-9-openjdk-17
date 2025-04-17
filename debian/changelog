@@ -1,11 +1,41 @@
-openjdk-17 (17.0.14+7-1~22.04.1) jammy-security; urgency=medium
+openjdk-17 (17.0.15+6~us1-0ubuntu1~22.04) jammy-security; urgency=medium
 
-  * Upload to Ubuntu 22.04.
-  * d/rules: disable dtrace on jammy armhf (LP: #2091226).
-  * d/t/problems.csv: fix typo - remove jdk prefix for
-    sun/security/util/Debug/DebugOptions.java.
+  * OpenJDK 17.0.15 release, build 6. Release notes:
+    https://mail.openjdk.org/pipermail/jdk-updates-dev/2025-April/043307.html
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Sat, 25 Jan 2025 14:06:32 +1300
+    - CVEs:
+      + CVE-2025-21587
+      + CVE-2025-30691
+      + CVE-2025-30698
+
+  [ Matthias Klose ]
+  * Honour DEB_BUILD_OPTIONS=parallel=N while running jtreg tests (Helmut
+    Grohne). Addresses: #1095920.
+
+  [ Pushkar Kulkarni ]
+  * d/control: regenerate for Ubuntu 22.04
+  * Upload to Ubuntu 22.04
+
+ -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Thu, 17 Apr 2025 11:54:53 +0530
+
+openjdk-17 (17.0.15~5ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.14 early access, build 5.
+
+  [ Vladimir Petko ]
+  * d/t/problems.csv: Disable tests failing due to upstream bugs.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 27 Mar 2025 13:35:58 +0100
+
+openjdk-17 (17.0.15~4ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.14 early access, build 4.
+
+  [ Vladimir Petko ]
+  * d/rules: Disable dtrace on jammy armhf (was not enabled before and cannot
+    be built due to a GCC ICE (see LP #2091225).
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 15 Mar 2025 09:45:37 +0100
 
 openjdk-17 (17.0.14+7-1) unstable; urgency=medium
 

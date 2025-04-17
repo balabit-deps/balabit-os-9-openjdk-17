@@ -1,7 +1,8 @@
 Source: @basename@
 Section: java
 Priority: optional
-Maintainer: OpenJDK Team <openjdk-17@packages.debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: OpenJDK Team <openjdk-17@packages.debian.org>
 Uploaders: Matthias Klose <doko@ubuntu.com>
 Build-Depends: @bd_debhelper@
   m4, lsb-release, zip, unzip,
