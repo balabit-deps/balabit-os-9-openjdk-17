@@ -6,7 +6,7 @@ Forwarded: no
 Last-Update: 2023-03-27
 --- a/test/jdk/com/sun/jndi/ldap/LdapPoolTimeoutTest.java
 +++ b/test/jdk/com/sun/jndi/ldap/LdapPoolTimeoutTest.java
-@@ -86,7 +86,9 @@
+@@ -86,7 +86,9 @@ public class LdapPoolTimeoutTest {
          env.put("com.sun.jndi.ldap.read.timeout", String.valueOf(READ_MILLIS));
          env.put("com.sun.jndi.ldap.connect.timeout", String.valueOf(CONNECT_MILLIS));
          env.put("com.sun.jndi.ldap.connect.pool", "true");
