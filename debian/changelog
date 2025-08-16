@@ -1,22 +1,53 @@
-openjdk-17 (17.0.15+6~us1-0ubuntu1~22.04) jammy-security; urgency=medium
+openjdk-17 (17.0.16+8~us1-0ubuntu1~22.04.1) jammy-security; urgency=medium
 
-  * OpenJDK 17.0.15 release, build 6. Release notes:
-    https://mail.openjdk.org/pipermail/jdk-updates-dev/2025-April/043307.html
+  * Upload to Ubuntu 22.04.
+  * CVEs:
+    - CVE-2025-50059, 8350991: Improve HTTP client header handling
+    - CVE-2025-30749, 8348989: Better Glyph drawing
+    - CVE-2025-50106, 8360147: Better Glyph drawing redux
+    - CVE-2025-30754, 8349594: Enhance TLS protocol support
+  * Security fixes:
+    - 8349111: Enhance Swing supports
+    - 8345625: Better HTTP connections
 
-    - CVEs:
-      + CVE-2025-21587
-      + CVE-2025-30691
-      + CVE-2025-30698
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 17 Jul 2025 09:51:35 +1200
 
-  [ Matthias Klose ]
+openjdk-17 (17.0.16+8~us1-0ubuntu1) questing; urgency=medium
+
+  * OpenJDK 17.0.16 release, build 8.
+    - Addresses CVE-2025-50059, CVE-2025-30749, CVE-2025-50106,
+      CVE-2025-30754. See
+      https://openjdk.org/groups/vulnerability/advisories/2025-07-15
+    - Release notes:
+      https://mail.openjdk.org/pipermail/jdk-updates-dev/2025-July/045614.html
+  * d/copyright: regenerate.
+  * d/copyright-generator/copyright-gen.py: bump copyright year.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Wed, 16 Jul 2025 10:17:07 +1200
+
+openjdk-17 (17.0.16~7ea-0ubuntu1) questing; urgency=medium
+
+  * OpenJDK 17.0.16 early access, build 7.
+  * d/p/jdk-8359735.patch: fix process tests failing in Ubuntu 25.10
+    (questing).
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Sat, 05 Jul 2025 18:39:24 +1200
+
+openjdk-17 (17.0.16~5ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.16 early access, build 5.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 03 Jun 2025 14:01:14 +0200
+
+openjdk-17 (17.0.15+6-1) unstable; urgency=high
+
+  * OpenJDK 17.0.15 release, build 6.
+    - Addresses CVE-2025-30698, CVE-2025-30691, CVE-2025-21587.
+
   * Honour DEB_BUILD_OPTIONS=parallel=N while running jtreg tests (Helmut
     Grohne). Addresses: #1095920.
 
-  [ Pushkar Kulkarni ]
-  * d/control: regenerate for Ubuntu 22.04
-  * Upload to Ubuntu 22.04
-
- -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Thu, 17 Apr 2025 11:54:53 +0530
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 24 Apr 2025 02:05:43 +0200
 
 openjdk-17 (17.0.15~5ea-1) unstable; urgency=medium
 
