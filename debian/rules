@@ -83,6 +83,7 @@ else
 endif
 
 is_upstream_release = yes
+#is_upstream_release =
 
 srcdir		= .
 builddir	= build
@@ -164,8 +165,14 @@ with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
 ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 loong64 mipsel mips64el powerpc x32))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
-ifeq ($(distribution)-$(distrel),Ubuntu-riscv64)
-  with_check = yes
+ifeq ($(distribution)-$(DEB_HOST_ARCH),Ubuntu-riscv64)
+  ifneq (,$(filter $(distrel),focal))
+    # disable jtreg check for riscv64 on focal, LP builders
+    # timeout during tests
+    with_check = disabled jtreg check for riscv64 on focal
+  else
+    with_check = yes
+  endif
 endif
 
 # no jtreg backport yet
@@ -277,10 +284,14 @@ else ifneq (,$(filter $(distrel),mantic noble))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-13
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-13
   bd_gcc = g++-13 <!cross>,
-else
+else ifneq (,$(filter $(distrel),trixie oracular plucky))
   export CC = $(DEB_HOST_GNU_TYPE)-gcc-14
   export CXX = $(DEB_HOST_GNU_TYPE)-g++-14
   bd_gcc = g++-14 <!cross>,
+else
+  export CC = $(DEB_HOST_GNU_TYPE)-gcc-15
+  export CXX = $(DEB_HOST_GNU_TYPE)-g++-15
+  bd_gcc = g++-15 <!cross>,
 endif
 
 # GCC 11 and up
@@ -1996,7 +2007,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.16+8
+git_tag			= jdk-17.0.17+10
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)

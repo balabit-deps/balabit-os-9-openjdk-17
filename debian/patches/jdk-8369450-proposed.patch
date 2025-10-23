@@ -1,0 +1,18 @@
+Description: [Ubuntu 25.10] openjdk fails to build due to rust-coreutils date
+ Add uutils as a GNU-compatible date provider.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Origin: upstream, https://github.com/openjdk/jdk/pull/27705
+Bug: https://bugs.openjdk.org/browse/JDK-8369450
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/openjdk-25/+bug/2127120
+Last-Update: 2025-10-09
+--- a/make/autoconf/basic_tools.m4
++++ b/make/autoconf/basic_tools.m4
+@@ -378,7 +378,7 @@
+ 
+   # Check if it's a GNU date compatible version
+   AC_MSG_CHECKING([if date is a GNU compatible version])
+-  check_date=`$DATE --version 2>&1 | $GREP "GNU\|BusyBox"`
++  check_date=`$DATE --version 2>&1 | $GREP "GNU\|BusyBox\|uutils"`
+   if test "x$check_date" != x; then
+     AC_MSG_RESULT([yes])
+     IS_GNU_DATE=yes

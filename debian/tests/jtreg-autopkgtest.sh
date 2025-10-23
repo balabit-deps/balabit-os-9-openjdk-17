@@ -102,7 +102,7 @@ for i in 0 1; do
   # save each try under its own folder to preserve history
   report_path="${i}/JTreport"
   report_dir="${output_dir}/${report_path}"
-  jtreg ${jt_options} \
+  LANG=C.UTF8 LC_ALL=C.UTF8 jtreg ${jt_options} \
     -vmoption:-Djtreg.home=/usr/share/jtreg \
     -verbose:summary \
     -automatic \
