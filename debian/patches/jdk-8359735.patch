@@ -17,7 +17,7 @@ Last-Update: 2025-06-19
 
 --- a/test/jdk/java/lang/ProcessBuilder/Basic.java
 +++ b/test/jdk/java/lang/ProcessBuilder/Basic.java
-@@ -696,7 +696,7 @@
+@@ -681,7 +681,7 @@ public class Basic {
          public static String path() { return path; }
          private static final String path = path0();
          private static String path0(){
@@ -26,7 +26,7 @@ Last-Update: 2025-06-19
                  return "/bin/true";
              } else {
                  File trueExe = new File("true");
-@@ -711,7 +711,7 @@
+@@ -696,7 +696,7 @@ public class Basic {
          public static String path() { return path; }
          private static final String path = path0();
          private static String path0(){
@@ -44,7 +44,7 @@ Last-Update: 2025-06-19
   * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
   *
   * This code is free software; you can redistribute it and/or modify it
-@@ -295,10 +295,12 @@
+@@ -294,10 +294,12 @@ public class InfoTest {
                      String expected = "sleep";
                      if (Platform.isWindows()) {
                          expected = "sleep.exe";

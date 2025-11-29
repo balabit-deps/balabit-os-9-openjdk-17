@@ -1,37 +1,57 @@
-openjdk-17 (17.0.16+8~us1-0ubuntu1~22.04.1) jammy-security; urgency=medium
+openjdk-17 (17.0.17+10-1~22.04) jammy-security; urgency=medium
 
   * Upload to Ubuntu 22.04.
-  * CVEs:
-    - CVE-2025-50059, 8350991: Improve HTTP client header handling
-    - CVE-2025-30749, 8348989: Better Glyph drawing
-    - CVE-2025-50106, 8360147: Better Glyph drawing redux
-    - CVE-2025-30754, 8349594: Enhance TLS protocol support
-  * Security fixes:
-    - 8349111: Enhance Swing supports
-    - 8345625: Better HTTP connections
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 17 Jul 2025 09:51:35 +1200
+ -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Thu, 23 Oct 2025 18:39:54 +0530
 
-openjdk-17 (17.0.16+8~us1-0ubuntu1) questing; urgency=medium
+openjdk-17 (17.0.17+10-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.17 release, build 10.
+    - CVEs:
+      + CVE-2025-53057, 8360937: Enhance certificate handling.
+      + CVE-2025-53066, 8356294: Enhance Path Factories.
+
+  [ Vladimir Petko ]
+  * d/t/jtreg-autopkgtest.*: Force utf-8 encoding.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 22 Oct 2025 08:14:04 +0200
+
+openjdk-17 (17.0.17~8ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.17 early access, build 8.
+
+  [ Vladimir Petko ]
+  * d/t/problems.csv: Synchronize problem list.
+  * d/p/jdk-8369450.patch: Fix ftbfs due to rust-coreutils date. LP: #2127120.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 27 Sep 2025 16:17:54 +0200
+
+openjdk-17 (17.0.17~5ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.17 early access, build 5.
+
+  [ Matthias Klose ]
+  * Build using GCC 15 on development releases.
+
+  [ Vladimir Petko ]
+  * d/rules: Disable jtreg test for riscv on focal.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 29 Aug 2025 12:15:33 +0200
+
+openjdk-17 (17.0.16+8-1) unstable; urgency=high
 
   * OpenJDK 17.0.16 release, build 8.
-    - Addresses CVE-2025-50059, CVE-2025-30749, CVE-2025-50106,
-      CVE-2025-30754. See
-      https://openjdk.org/groups/vulnerability/advisories/2025-07-15
+    - Addresses CVE-2025-5010, CVE-2025-50059, CVE-2025-30754, CVE-2025-30749.
+      See https://openjdk.org/groups/vulnerability/advisories/2025-07-15.
     - Release notes:
       https://mail.openjdk.org/pipermail/jdk-updates-dev/2025-July/045614.html
-  * d/copyright: regenerate.
-  * d/copyright-generator/copyright-gen.py: bump copyright year.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Wed, 16 Jul 2025 10:17:07 +1200
+  [ Vladimir Petko ]
+  * d/p/jdk-8359735-proposed.patch: Fix process tests failing in Ubuntu 25.10.
+  * d/copyright-generator/copyright-gen.py: Bump copyright year.
+  * d/copyright: Regenerate.
 
-openjdk-17 (17.0.16~7ea-0ubuntu1) questing; urgency=medium
-
-  * OpenJDK 17.0.16 early access, build 7.
-  * d/p/jdk-8359735.patch: fix process tests failing in Ubuntu 25.10
-    (questing).
-
- -- Vladimir Petko <vladimir.petko@canonical.com>  Sat, 05 Jul 2025 18:39:24 +1200
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 19 Jul 2025 12:22:09 +0200
 
 openjdk-17 (17.0.16~5ea-1) unstable; urgency=medium
 
