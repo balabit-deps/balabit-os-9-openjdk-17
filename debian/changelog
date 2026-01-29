@@ -1,8 +1,43 @@
-openjdk-17 (17.0.17+10-1~22.04) jammy-security; urgency=medium
+openjdk-17 (17.0.18+8-1~22.04.1) jammy-security; urgency=medium
 
   * Upload to Ubuntu 22.04.
+  * d/rules: Disable jtreg tests on Ubuntu RISCV platform. Launchpad
+    builders time out.
 
- -- Pushkar Kulkarni <pushkar.kulkarni@canonical.com>  Thu, 23 Oct 2025 18:39:54 +0530
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 29 Jan 2026 16:35:19 +1300
+
+openjdk-17 (17.0.18+8-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.18 release, build 8.
+   - CVEs:
+      + CVE-2026-21945: 8368032: Enhance Certificate Checking.
+      + CVE-2026-21932: 8359501: Enhance Handling of URIs.
+      + CVE-2026-21933: 8362632: Improve HttpServer Request handling.
+      + CVE-2026-21925: 8341496: Improve JMX connections.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 22 Jan 2026 12:38:58 +1300
+
+openjdk-17 (17.0.18~7ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.18 early access, build 7.
+
+  [ Matthias Klose ]
+  * d/rules: Run the testsuite for loong64, don't run on riscv64.
+
+  [ Pushkar Kulkarni ]
+  * d/t/jtreg-autopkgtest.*: use locale name "C.UTF-8" on bionic
+    and focal.
+
+  [ Vladimir Petko ]
+  * d/p/jdk-8369450-proposed.patch: Drop patch applied upstream.
+  * Update override comments for unstripped-binary-or-object. We need to
+    keep symbols for Native Memory Tracking to work.
+  * d/{JB-doc.overrides.in, JB-jre-headless.overrides.in}: Add override
+    for old FSF copyright address.
+  * d/s/lintian-overrides: Override false positive debian-rules-calls-
+    nproc. The utility is used to log the number of processors.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 05 Jan 2026 15:55:38 +1300
 
 openjdk-17 (17.0.17+10-1) unstable; urgency=medium
 
