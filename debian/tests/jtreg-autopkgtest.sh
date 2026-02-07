@@ -97,12 +97,25 @@ trap "cleanup" EXIT INT TERM ERR
 jtwork_dir="${AUTOPKGTEST_TMP}/${testsuite}/JTwork"
 output_dir="${AUTOPKGTEST_ARTIFACTS}/${testsuite}/"
 
+# force utf-8 for tests
+distrel=$(lsb_release --codename --short)
+case "$distrel" in
+    bionic|focal)
+        c_utf8="C.UTF-8"
+        ;;
+    *)
+        c_utf8="C.UTF8"
+        ;;
+esac
+
+LANG=${c_utf8}
+
 # retry tests with "fail" or "error" status at most 3 times
 for i in 0 1; do
   # save each try under its own folder to preserve history
   report_path="${i}/JTreport"
   report_dir="${output_dir}/${report_path}"
-  LANG=C.UTF8 LC_ALL=C.UTF8 jtreg ${jt_options} \
+  LANG=${c_utf8} LC_ALL=${c_utf8} jtreg ${jt_options} \
     -vmoption:-Djtreg.home=/usr/share/jtreg \
     -verbose:summary \
     -automatic \

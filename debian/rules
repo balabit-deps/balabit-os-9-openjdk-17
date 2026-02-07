@@ -83,7 +83,6 @@ else
 endif
 
 is_upstream_release = yes
-#is_upstream_release =
 
 srcdir		= .
 builddir	= build
@@ -162,17 +161,13 @@ jtreg_pkg = jtreg7
 testng_pkg= libtestng7-java
 
 with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
-ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel ia64 loong64 mipsel mips64el powerpc x32))
+ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel mipsel mips64el powerpc riscv64 x32))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
 ifeq ($(distribution)-$(DEB_HOST_ARCH),Ubuntu-riscv64)
-  ifneq (,$(filter $(distrel),focal))
-    # disable jtreg check for riscv64 on focal, LP builders
+    # disable jtreg check for riscv64 on LP builders,
     # timeout during tests
     with_check = disabled jtreg check for riscv64 on focal
-  else
-    with_check = yes
-  endif
 endif
 
 # no jtreg backport yet
@@ -2007,7 +2002,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.17+10
+git_tag			= jdk-17.0.18+8
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)
