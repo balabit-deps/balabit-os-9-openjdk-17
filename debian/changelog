@@ -1,10 +1,66 @@
-openjdk-17 (17.0.18+8-1~22.04.1) jammy-security; urgency=medium
+openjdk-17 (17.0.19+10-1~22.04.2) jammy-security; urgency=medium
 
   * Upload to Ubuntu 22.04.
-  * d/rules: Disable jtreg tests on Ubuntu RISCV platform. Launchpad
-    builders time out.
+  * d/rules: Do not validate control files for the old releases.
 
- -- Vladimir Petko <vladimir.petko@canonical.com>  Thu, 29 Jan 2026 16:35:19 +1300
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Sun, 26 Apr 2026 21:27:46 +1200
+
+openjdk-17 (17.0.19+10-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.19 release, build 10.
+    - CVEs:
+      + CVE-2026-22016: 8370529: Enhance Path Factories Redux
+      + CVE-2026-34282: 8374557: Enhance TLS connection handling
+      + CVE-2026-22021: 8371830: Enhance certificate chain validation
+      + CVE-2026-22013: 8370615: Improve Kerberos credentialing
+      + CVE-2026-23865: 8379158: Update FreeType to 2.14.2
+      + CVE-2026-22018: 8370986: Enhance Zip file reading
+      + CVE-2026-22007: 8369575: Enhance crypto algorithm support
+      + CVE-2026-34268: 8371935: Enhance key generation
+  * d/rules: Check generated files only on amd64. This resolves riscv64
+    ftbfs, as some architectures change with_check flag.
+  * d/t/problems.csv: Fix typo in loong64 excluded tests lists.
+  * Add common GPL and Apache license headers to copyright generator.
+  * d/copyright: Regenerate.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 24 Apr 2026 14:03:13 +1200
+
+openjdk-17 (17.0.19~9ea-2) unstable; urgency=medium
+
+  * Ensure that all generated files are up to date:
+    - The copyright generator now checks if the current directory contains
+      an unpacked OpenJDK tree by verifying the presence of the
+      ASSEMBLY_EXCEPTION file.
+    - The copyright generator now drops common license text in-memory,
+      without running a shell script that modifies the source tree.
+    - d/rules: Add targets to generate all files and check that they match
+      the ones provided in the source package.
+    - d/rules: Add nogen DEB_BUILD_OPTION to disable file regeneration.
+  * d/rules: Use '-' instead of '~' in opt version string, swap package
+    version and distribution.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 17 Apr 2026 09:49:19 +1200
+
+openjdk-17 (17.0.19~9ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.19 early access, build 9.
+  * d/rules: Revert replace '~' with '-' in the optional version string.
+    This should be resolved upstream.
+  * d/t/problems.csv: Update problem list.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Mon, 16 Mar 2026 15:31:01 +1300
+
+openjdk-17 (17.0.19~6ea-1) unstable; urgency=medium
+
+  * OpenJDK 17.0.19 early access, build 6.
+  * d/rules: Replace '~' with '-' in the optional version string.
+  * d/dbg.py: Fix syntax errors in gdb unwinder, do not install unwinder
+    for zero, install hotspot unwinder in the correct directory.
+    Disable debug traces. Load unwinder in the disabled state.
+    Return iterator rather than list from OpenJDKFrameFilter.flatten().
+    Remove unused code from NativeMethodInfo.
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Fri, 13 Mar 2026 14:44:35 +1300
 
 openjdk-17 (17.0.18+8-1) unstable; urgency=medium
 

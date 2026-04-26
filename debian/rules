@@ -165,9 +165,13 @@ ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel mipsel mips64el powerpc riscv64 x
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
 ifeq ($(distribution)-$(DEB_HOST_ARCH),Ubuntu-riscv64)
-    # disable jtreg check for riscv64 on LP builders,
+  ifneq (,$(filter $(distrel),focal))
+    # disable jtreg check for riscv64 on focal, LP builders
     # timeout during tests
     with_check = disabled jtreg check for riscv64 on focal
+  else
+    with_check = yes
+  endif
 endif
 
 # no jtreg backport yet
@@ -515,10 +519,12 @@ else
 	--with-vendor-vm-bug-url='Unknown'
 endif
 
+v_pkgrel_opt	:= $(subst ~,-,$(v_pkgrel))
+
 COMMON_CONFIGURE_ARGS += \
 	--with-version-pre='$(if $(filter yes, $(is_upstream_release)),,ea)' \
 	--with-version-build='$(v_upbuild)' \
-	--with-version-opt='$(distribution)-$(v_pkgrel)' \
+	--with-version-opt='$(v_pkgrel_opt)-$(distribution)' \
 	--with-copyright-year=$(PKGYEAR) \
 
 COMMON_CONFIGURE_ARGS += \
@@ -948,7 +954,7 @@ ifneq ($(with_debugedit),yes)
   control_vars += '-Vdbg:Conflicts=openjdk-11-dbg, openjdk-12-dbg, openjdk-13-dbg, openjdk-14-dbg, openjdk-15-dbg, openjdk-16-dbg'
 endif
 
-debian/control: debian/control.in debian/tests/control debian/rules debian/watch
+debian/control: debian/control.in debian/tests/control gen-autopkgtests debian/watch
 	@cp -p debian/control debian/control.old
 	sed \
 	      -e 's/@basename@/$(basename)/g' \
@@ -982,18 +988,28 @@ debian/control: debian/control.in debian/tests/control debian/rules debian/watch
 	  rm -f debian/control.old; \
 	else \
 	  diff -u debian/control.old debian/control | wdiff -d -; \
-	  echo "debian/control did change, please restart the build"; \
+	  echo "debian/control did change, please restart the build. Run make -f debian/rules update-control-files to update packaging sources."; \
 	  rm -f debian/control.old; \
 	  exit 1; \
 	fi
 
-debian/tests/control: debian/tests/control.in debian/rules
+debian/tests/control: debian/tests/control.in
+	cp -p $@ $@.old
 	sed \
 		-e 's/@jtreg_pkg@/$(jtreg_pkg)/g' \
 		-e 's/@min_jtreg_version@/$(min_jtreg_version)/g' \
 		$< > $@;
+	@if cmp -s $@ $@.old; then \
+	  rm -f $@.old; \
+	else \
+	  diff -u $@.old $@ | wdiff -d -; \
+	  echo "$@ did change, please restart the build. Run make -f debian/rules update-control-files to update packaging sources."; \
+	  rm -f $@.old; \
+	  exit 1; \
+	fi
 
-debian/tests/%.sh: debian/tests/%.in debian/rules
+debian/tests/%.sh: debian/tests/%.in
+	cp -p $@ $@.old
 	sed \
 		-e 's/@basename@/$(basename)/g' \
 		-e 's,@JDK_DIR@,/$(basedir),g' \
@@ -1002,6 +1018,14 @@ debian/tests/%.sh: debian/tests/%.in debian/rules
 		-e 's:@doc_dir@:/usr/share/doc/$(p_jrehl)/:g' \
 		$< > $@;
 	chmod +x $@
+	@if cmp -s $@ $@.old; then \
+	  rm -f $@.old; \
+	else \
+	  diff -u $@.old $@ | wdiff -d -; \
+	  echo "$@ did change, please restart the build. Run make -f debian/rules update-control-files to update packaging sources."; \
+	  rm -f $@.old; \
+	  exit 1; \
+	fi
 
 gen-autopkgtests: debian/tests/jtdiff-autopkgtest.sh \
 	debian/tests/jtreg-autopkgtest.sh \
@@ -1134,7 +1158,36 @@ build_stamps = \
 
 build_stamps +=  stamps/jtreg-check-default
 
-pre-build:
+update-control-files: debian/control debian/tests/control gen-autopkgtests update-license
+
+update-license:
+	@cp -p debian/copyright debian/copyright.old
+	./debian/copyright-generator/copyright-gen.py
+	@if cmp -s  debian/copyright debian/copyright.old; then \
+	  rm -f  debian/copyright.old; \
+	else \
+	  diff -u debian/copyright.old debian/copyright | wdiff -d -; \
+	  echo "debian/copyright did change, please restart the build. Run make -f debian/rules update-control-files to update packaging sources."; \
+	  rm -f debian/copyright.old; \
+	  exit 1; \
+	fi
+
+ifeq (,$(filter nogen, $(DEB_BUILD_OPTIONS)))
+# Only check control files on amd64, other architectures may have
+# nocheck set by d/rules, e.g. riscv64
+ifeq (amd64,$(DEB_HOST_ARCH))
+PRE_BUILD_DEP = update-control-files
+endif
+else
+PRE_BUILD_DEP =
+endif
+
+# do not validate control files for the old releases
+ifneq (,$(filter $(distrel),squeeze wheezy jessie stretch buster bullseye bookworm lucid precise trusty xenial bionic focal))
+PRE_BUILD_DEP =
+endif
+
+pre-build: $(PRE_BUILD_DEP)
 ifeq ($(with_check),yes)
 	jtreg_version="$$(dpkg-query -f '$${Version}\n' -W $(jtreg_pkg))"; \
 	if ! dpkg --compare-versions $(min_jtreg_version) le $$jtreg_version; then \
@@ -1784,14 +1837,9 @@ endif
 
 	: # OpenJDK Stack Unwinder and Frame Decorator
 ifneq (,$(filter $(DEB_HOST_ARCH),amd64))
-	mkdir -p $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/jre/lib/server
+	mkdir -p $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/lib/server
 	cp debian/dbg.py \
-	  $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/jre/lib/server/libjvm.so-gdb.py
-  ifneq (,$(filter zero, $(alternate_vms)))
-	mkdir -p $(d_jrez)/usr/share/gdb/auto-load/$(basedir)/jre/lib/zero
-	ln -sf ../server/libjvm.so-gdb.py \
-	  $(d_jrez)/usr/share/gdb/auto-load/$(basedir)/jre/lib/zero/libjvm.so
-  endif
+	  $(d_jrehl)/usr/share/gdb/auto-load/$(basedir)/lib/server/libjvm.so-gdb.py
 endif
 
 ifeq ($(with_bridge),atk)
@@ -2002,7 +2050,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.18+8
+git_tag			= jdk-17.0.19+10
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)
@@ -2016,6 +2064,7 @@ gtest_tag = 1.14.0
 gtestdir = ../$(basename)-$(package_version)-googletest.orig
 
 debian/watch: debian/watch.in debian/rules
+	@cp -p $@ $@.old
 	sed \
 		-e 's|@git_url@|$(git_url)/tags|g' \
 		-e 's|@gtest_repo@|$(gtest_repo)/tags|g' \
@@ -2026,6 +2075,14 @@ debian/watch: debian/watch.in debian/rules
 ifeq ($(is_upstream_release),yes)
 	sed -i 's|repack.*\\|repack,\\|g' debian/watch
 endif
+	@if cmp -s $@ $@.old; then \
+		rm -f $@.old; \
+	else \
+		diff -u $@.old $@ | wdiff -d -; \
+		echo "$@ did change, please restart the build"; \
+		rm -f $@.old; \
+		exit 1; \
+	fi
 
 get-gtest:
 	rm -rf $(gtestdir) || true
@@ -2071,4 +2128,4 @@ get-orig: get-gtest
 	rm -rf $(origdir)
 
 binary: binary-arch binary-indep
-.PHONY: build build-arch build-indep clean binary-indep binary-arch binary install packaging-files
+.PHONY: build build-arch build-indep clean binary-indep binary-arch binary install packaging-files debian/control debian/tests/control gen-autopkgtests debian/watch update-control-files update-license
