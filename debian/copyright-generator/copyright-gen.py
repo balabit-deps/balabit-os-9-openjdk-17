@@ -79,7 +79,7 @@ openjdk_copyrights = [
 ]
 
 ## TODO: Can the script deduce this list?
-upstream_authors = [ 
+upstream_authors = [
   "Oracle and/or its affiliates",
   "Sun Microsystems, Inc",
   "Red Hat, Inc",
@@ -114,7 +114,7 @@ def print_header_stanza(format, files_excluded, source, comment):
 def print_file_stanza(files, copyrights, license, comments):
   print_field("Files", True, files)
   print_field("Copyright", False, copyrights)
-  print_field("License", True, license) 
+  print_field("License", True, license)
   if (comments is not None and len(comments) != 0):
     print_field("Comments", True, comments)
   print() # an empty line
@@ -129,7 +129,7 @@ def generate_comment_str():
       {upstream_authors_str}
     Packaged by:
       {packaged_by}"""
-    
+
 def generate_header_stanza():
   format = "https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/"
   excluded = generate_excluded_files_str()
@@ -137,18 +137,34 @@ def generate_header_stanza():
   comment = generate_comment_str()
   print_header_stanza(format, excluded, source, comment)
 
+def strip_license_line(line:str):
+    return line.replace("### ","").replace("```", "").replace("<pre>", "").replace("</pre>", "")
+
 def get_content(path):
   lines = []
+  COMMON_LICENSES = ["### Apache 2.0 License",
+    "### GNU GENERAL PUBLIC LICENSE v2",
+    "### GPL v2",
+    "### GPL version 3",
+    "### GNU GENERAL PUBLIC LICENSE v3",
+    "### Apache License v2.0"]
+  skip = False
   with open(path, 'r') as file:
     for line in file:
-      lines.append(line
-        .replace("### ","")
-        .replace("```", "")
-        .replace("<pre>", "")
-        .replace("</pre>", ""))
-
+        if skip:
+            if line.startswith("### "):
+                skip = False
+            else:
+                continue
+        stripped = line.strip("\n")
+        if stripped in COMMON_LICENSES:
+            line = stripped + ": Refer to the copy under /usr/share/common-licenses\n\n"
+            lines.append(strip_license_line(line))
+            skip = True
+        if not skip:
+            lines.append(strip_license_line(line))
   return lines[0], "".join(lines[1:])
-  
+
 
 def fill_with_dots_and_indent(text):
   indentation = " " * 2
@@ -179,7 +195,7 @@ def gen_license_text(license):
 
 ------------------------------------------------------------------------------"""
 
-    
+
 def gather_legal_dirs(path):
   legal_dirs = []
   for root, dirs, files in os.walk(path):
@@ -210,12 +226,17 @@ def find_directory(prefix, path = '.'):
       return file.path
 
 def search_source_rootdir(level, path = '.'):
+  if os.path.exists(path + "/ASSEMBLY_EXCEPTION"):
+    print("Assembly exception found. Skipping source package search.", file=sys.stderr)
+    return "."
+
   # The user might have already pulled the source package.
   # Search for a downloaded package at three levels
   #  - openjdk
   #  - openjdk/debian
   #  - openjdk/debian/copyright-generator
   # if one none found, download the source package
+
   rootdir = find_directory(f"openjdk-{version}", path)
   if rootdir is not None:
     return rootdir
@@ -244,9 +265,8 @@ def generate_copyright():
     print("No source package found. Download also failed. Aborting.")
     exit(2)
   print(f"Using the source package at {rootdir}", file = sys.stderr)
-  srcdir = f"{rootdir}/src"; 
+  srcdir = f"{rootdir}/src";
 
-  os.system(f"/bin/sh ./debian/copyright-generator/strip-common-licenses.sh {rootdir} {version}")
   generate_header_stanza();
 
   licenses = f"""GPL with Classpath exception
@@ -269,7 +289,7 @@ The following licenses for third party code are taken from 'legal' \ndirectories
   # clean-up
   if needs_cleanup:
     os.system(f"rm -rf *.debian.tar.xz *.orig.tar.xz *.dsc *googletest.tar.xz");
-    
+
 
 
 def detect_version():
@@ -293,4 +313,4 @@ def main():
     print("Version not supported.")
 
 if __name__ == "__main__":
-  main()    
+  main()
