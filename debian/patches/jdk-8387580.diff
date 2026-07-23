@@ -1,0 +1,36 @@
+From b9ea4636bea0f6264b2c602e4203e8e604d8da6e Mon Sep 17 00:00:00 2001
+From: Vladimir Petko <vladimir.petko@canonical.com>
+Date: Tue, 7 Jul 2026 09:58:32 +1200
+Subject: [PATCH] fix(TemplateTable): use float operations for fast_xaccess()
+ and fstore().
+ This PR changes fstore and fast_xaccess operations to generate float
+ (4 byte) instructions on S390x. This resolves out of bound read and
+ writes on float that causes a segmentation fault with
+ Compact Object Headers enabled.
+Bug: https://bugs.openjdk.org/browse/JDK-8387580
+Origin: upstream, https://github.com/openjdk/jdk/commit/978dfecb6545166aee93a8e68c9c82535b0cb3e2
+
+---
+ src/hotspot/cpu/s390/templateTable_s390.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/hotspot/cpu/s390/templateTable_s390.cpp
++++ b/src/hotspot/cpu/s390/templateTable_s390.cpp
+@@ -1042,7 +1042,7 @@
+ void TemplateTable::fstore() {
+   transition(ftos, vtos);
+   locals_index(Z_R1_scratch);
+-  __ freg2mem_opt(Z_ftos, faddress(_masm, Z_R1_scratch));
++  __ freg2mem_opt(Z_ftos, faddress(_masm, Z_R1_scratch), false);
+ }
+
+ void TemplateTable::dstore() {
+@@ -3360,7 +3360,7 @@
+       __ verify_oop(Z_tos);
+       break;
+     case ftos:
+-      __ mem2freg_opt(Z_ftos, Address(receiver, index));
++      __ mem2freg_opt(Z_ftos, Address(receiver, index), false);
+       break;
+     default:
+       ShouldNotReachHere();
