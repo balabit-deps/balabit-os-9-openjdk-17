@@ -1904,7 +1904,7 @@ License:   GPL with Classpath exception
   .
   The Source Code of this file is available under the
   Mozilla Public License, v. 2.0 and is located at
-  https://raw.githubusercontent.com/publicsuffix/list/1cbd6e71a9b83620b1d0b11e49d3d9ff48c27e22/public_suffix_list.dat.
+  https://raw.githubusercontent.com/publicsuffix/list/823beb1425def931c8b0b170a6bc33b424c3f9b0/public_suffix_list.dat.
   If a copy of the MPL was not distributed with this file, you can obtain one
   at https://mozilla.org/MPL/2.0/.
   .
@@ -2526,7 +2526,7 @@ License:   GPL with Classpath exception
   --- end of LICENSE ---
   .
   ------------------------------------------------------------------------------
-  %% This notice is provided with respect to The FreeType Project: Freetype v2.14.2,
+  %% This notice is provided with respect to The FreeType Project: Freetype v2.14.3,
   which may be included with JRE 17, JDK 17 and OpenJDK 17
   .
   --- begin of LICENSE ---
@@ -2552,24 +2552,24 @@ License:   GPL with Classpath exception
   FreeType License
   .
   .
-  Copyright (C) 1996-2025 by David Turner, Robert Wilhelm, and Werner Lemberg.
-  Copyright (C) 2007-2025 by Dereg Clegg and Michael Toftdal.
-  Copyright (C) 1996-2025 by Just van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.
-  Copyright (C) 2022-2025 by David Turner, Robert Wilhelm, Werner Lemberg, George Williams, and
-  Copyright (C) 2004-2025 by Masatake YAMATO and Redhat K.K.
-  Copyright (C) 2007-2025 by Derek Clegg and Michael Toftdal.
-  Copyright (C) 2003-2025 by Masatake YAMATO, Red Hat K.K.,
-  Copyright (C) 1996-2025 by David Turner, Robert Wilhelm, Werner Lemberg, and Dominik Röttsches.
-  Copyright (C) 2007-2025 by David Turner.
-  Copyright (C) 2022-2025 by David Turner, Robert Wilhelm, Werner Lemberg, and Moazin Khatti.
-  Copyright (C) 2007-2025 by Rahul Bhalerao <rahul.bhalerao@redhat.com>, <b.rahul.pm@gmail.com>.
-  Copyright (C) 2025 by Behdad Esfahbod.
-  Copyright (C) 2008-2025 by David Turner, Robert Wilhelm, Werner Lemberg, and suzuki toshiya.
-  Copyright (C) 2013-2025 by Google, Inc.
-  Copyright (C) 2019-2025 by Nikhil Ramakrishnan, David Turner, Robert Wilhelm, and Werner Lemberg.
-  Copyright (C) 2009-2025 by Oran Agra and Mickey Gabel.
-  Copyright (C) 2018-2025 by David Turner, Robert Wilhelm, Dominik Röttsches, and Werner Lemberg.
-  Copyright (C) 2004-2025 by David Turner, Robert Wilhelm, Werner Lemberg, and George Williams.
+  Copyright (C) 1996-2026 by David Turner, Robert Wilhelm, and Werner Lemberg.
+  Copyright (C) 2007-2026 by Dereg Clegg and Michael Toftdal.
+  Copyright (C) 1996-2026 by Just van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.
+  Copyright (C) 2022-2026 by David Turner, Robert Wilhelm, Werner Lemberg, George Williams, and
+  Copyright (C) 2004-2026 by Masatake YAMATO and Redhat K.K.
+  Copyright (C) 2007-2026 by Derek Clegg and Michael Toftdal.
+  Copyright (C) 2003-2026 by Masatake YAMATO, Red Hat K.K.,
+  Copyright (C) 1996-2026 by David Turner, Robert Wilhelm, Werner Lemberg, and Dominik Röttsches.
+  Copyright (C) 2007-2026 by David Turner.
+  Copyright (C) 2022-2026 by David Turner, Robert Wilhelm, Werner Lemberg, and Moazin Khatti.
+  Copyright (C) 2007-2026 by Rahul Bhalerao <rahul.bhalerao@redhat.com>, <b.rahul.pm@gmail.com>.
+  Copyright (C) 2025-2026 by Behdad Esfahbod.
+  Copyright (C) 2008-2026 by David Turner, Robert Wilhelm, Werner Lemberg, and suzuki toshiya.
+  Copyright (C) 2013-2026 by Google, Inc.
+  Copyright (C) 2019-2026 by Nikhil Ramakrishnan, David Turner, Robert Wilhelm, and Werner Lemberg.
+  Copyright (C) 2009-2026 by Oran Agra and Mickey Gabel.
+  Copyright (C) 2018-2026 by David Turner, Robert Wilhelm, Dominik Röttsches, and Werner Lemberg.
+  Copyright (C) 2004-2026 by David Turner, Robert Wilhelm, Werner Lemberg, and George Williams.
                       The FreeType Project LICENSE
                       ----------------------------
   .
@@ -2621,7 +2621,7 @@ License:   GPL with Classpath exception
   .
      """
       Portions of this software are copyright © <year> The FreeType
-      Project (www.freetype.org).  All rights reserved.
+      Project (https://freetype.org).  All rights reserved.
      """
   .
     Please replace <year> with the value from the FreeType version you
@@ -2735,7 +2735,7 @@ License:   GPL with Classpath exception
   .
     Our home page can be found at
   .
-      https://www.freetype.org
+      https://freetype.org
   .
   .
   .
@@ -2838,7 +2838,7 @@ License:   GPL with Classpath exception
   --- end of LICENSE ---
   .
   ------------------------------------------------------------------------------
-  %% This notice is provided with respect to Harfbuzz 12.3.2,
+  %% This notice is provided with respect to Harfbuzz v14.2.0,
   which may be included with JRE 17, JDK 17 and OpenJDK 17
   .
   --- begin of LICENSE ---
@@ -2918,7 +2918,7 @@ License:   GPL with Classpath exception
   The below applies to the following file(s):
   libharfbuzz/hb-unicode-emoji-table.hh
   .
-  © 2024 Unicode®, Inc.
+  © 2025 Unicode®, Inc.
   .
   Unicode and the Unicode Logo are registered trademarks of Unicode, Inc.
   in the U.S. and other countries.
@@ -2949,7 +2949,7 @@ License:   GPL with Classpath exception
   --- end of LICENSE ---
   .
   ------------------------------------------------------------------------------
-  %% This notice is provided with respect to Little Color Management System (LCMS) v2.17,
+  %% This notice is provided with respect to Little Color Management System (LCMS) v2.19.1,
   which may be included with JRE 17, JDK 17 and OpenJDK 17
   .
   --- begin of LICENSE ---
@@ -2959,7 +2959,7 @@ License:   GPL with Classpath exception
   .
   MIT License
   .
-  Copyright (C) 1998-2025 Marti Maria Saguer
+  Copyright (C) 1998-2026 Marti Maria Saguer
   .
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the "Software"),
@@ -3040,6 +3040,7 @@ License:   GPL with Classpath exception
   Lovell Fuller
   Eli Schwartz
   Diogo Teles Sant'Anna
+  Vlad Erium
   .
   Special Thanks
   --------------
@@ -3710,7 +3711,7 @@ License:   GPL with Classpath exception
   --- end of LICENSE ---
   .
   ------------------------------------------------------------------------------
-  %% This notice is provided with respect to JLine v3.26.1,
+  %% This notice is provided with respect to JLine v3.29.0,
   which may be included with JRE 17, JDK 17 and OpenJDK 17
   .
   --- begin of LICENSE ---

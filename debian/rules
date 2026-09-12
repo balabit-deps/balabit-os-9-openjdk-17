@@ -160,7 +160,7 @@ endif
 jtreg_pkg = jtreg7
 testng_pkg= libtestng7-java
 
-with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)),,yes)
+with_check = $(if $(findstring nocheck, $(DEB_BUILD_OPTIONS)$(DEB_BUILD_PROFILES)),,yes)
 ifneq (,$(filter $(DEB_HOST_ARCH), alpha armel mipsel mips64el powerpc riscv64 x32))
   with_check = disabled running check on $(DEB_HOST_ARCH)
 endif
@@ -1161,6 +1161,9 @@ build_stamps +=  stamps/jtreg-check-default
 update-control-files: debian/control debian/tests/control gen-autopkgtests update-license
 
 update-license:
+ifneq (,$(filter $(distrel),squeeze wheezy jessie stretch buster bullseye bookworm lucid precise trusty xenial bionic focal))
+	@echo "Skipping debian/copyright valdidation for $(distrel), old release."
+else
 	@cp -p debian/copyright debian/copyright.old
 	./debian/copyright-generator/copyright-gen.py
 	@if cmp -s  debian/copyright debian/copyright.old; then \
@@ -1171,19 +1174,18 @@ update-license:
 	  rm -f debian/copyright.old; \
 	  exit 1; \
 	fi
+endif
 
+PRE_BUILD_DEP =
 ifeq (,$(filter nogen, $(DEB_BUILD_OPTIONS)))
-# Only check control files on amd64, other architectures may have
-# nocheck set by d/rules, e.g. riscv64
+# Only check control files on amd64
 ifeq (amd64,$(DEB_HOST_ARCH))
 PRE_BUILD_DEP = update-control-files
 endif
-else
-PRE_BUILD_DEP =
 endif
 
-# do not validate control files for the old releases
-ifneq (,$(filter $(distrel),squeeze wheezy jessie stretch buster bullseye bookworm lucid precise trusty xenial bionic focal))
+# do not check control files if with_check is disabled
+ifneq ($(with_check),yes)
 PRE_BUILD_DEP =
 endif
 
@@ -2050,7 +2052,7 @@ endif
 	dh_builddeb -a $(nodemo) $(nojrez) #$(bd_options)
 
 git_project		= jdk17u
-git_tag			= jdk-17.0.19+10
+git_tag			= jdk-17.0.20+8
 package_version		= $(subst jdk-,,$(git_tag))
 package_version		= $(shell echo $(PKGVERSION) | sed 's/-[^-][^-]*$$//')
 ifneq ($(is_upstream_release),yes)

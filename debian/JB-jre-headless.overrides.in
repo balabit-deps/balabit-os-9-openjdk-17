@@ -9,7 +9,6 @@
 @basename@-jre-headless binary: debug-suffix-not-dbg
 
 # Upstream implementation
-@basename@-jre-headless binary: exit-in-shared-library
 @basename@-jre-headless binary: spelling-error-in-binary
 
 # Override due to upstream copyright
